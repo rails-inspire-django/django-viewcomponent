@@ -1,0 +1,16 @@
+<div class="calendar-component">
+  <h1>
+    {% if self.header.filled %}
+      {{ self.header.value }}
+    {% else %}
+      Today's date is <span>{{ date }}</span>
+    {% endif %}
+  </h1>
+  <main>
+    {% if self.body.filled %}
+      {{ self.body.value }}
+    {% else %}
+      You have no events today.
+    {% endif %}
+  </main>
+</div>

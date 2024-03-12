@@ -1,0 +1,27 @@
+{% load viewcomponent_tags %}
+<div class="dashboard-component">
+
+  {% with dashboard_component=self %}
+    {% component "calendar" date="2020-06-06" as calendar_component %}
+
+      {% call calendar_component.header %}
+        {% if dashboard_component.header.filled %}
+          {{ dashboard_component.header.value }}
+        {% else %}
+          Welcome to your dashboard!
+        {% endif %}
+      {% endcall %}
+
+      {% call calendar_component.body %}
+        Here are your to-do items for today:
+      {% endcall %}
+
+    {% endcomponent %}
+  {% endwith %}
+
+  <ol>
+    {% for item in items %}
+      <li>{{ item }}</li>
+    {% endfor %}
+  </ol>
+</div>

@@ -1,0 +1,11 @@
+{% if self.outer.filled %}
+  {{ self.outer.value }}
+{% else %}
+  <div id="outer">
+    {% if self.inner.filled %}
+      {{ self.inner.value }}
+    {% else %}
+      Default
+    {% endif %}
+  </div>
+{% endif %}

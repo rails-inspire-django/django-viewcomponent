@@ -1,0 +1,15 @@
+{# Example from django-components/issues/98 #}
+<div class="frontmatter-component">
+    <div class="title">
+      {% if self.title.filled %}
+        {{ self.title.value }}
+      {% else %}
+        Title
+      {% endif %}
+    </div>
+
+    {% if self.subtitle.filled %}
+      <div class="subtitle">{{ self.subtitle.value }}</div>
+    {% endif %}
+
+</div>

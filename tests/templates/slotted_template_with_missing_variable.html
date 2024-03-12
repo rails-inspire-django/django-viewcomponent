@@ -1,0 +1,29 @@
+<custom-template>
+
+    {{ missing_context_variable }}
+
+    <header>
+      {% if self.header.filled %}
+        {{ self.header.value }}
+      {% else %}
+          Default header
+      {% endif %}
+    </header>
+
+    <main>
+      {% if self.main.filled %}
+        {{ self.main.value }}
+      {% else %}
+        Default main
+      {% endif %}
+    </main>
+
+    <footer>
+      {% if self.footer.filled %}
+        {{ self.footer.value }}
+      {% else %}
+        Default footer
+      {% endif %}
+    </footer>
+
+</custom-template>

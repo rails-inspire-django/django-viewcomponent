@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "django-viewcomponent"
+version = "1.0.1"
+description = "Build reusable components in Django, inspired by Rails ViewComponent"
+authors = ["Michael Yin <michaelyin@accordbox.com>"]
+license = "MIT"
+homepage = "https://github.com/rails-inspire-django/django-view-component"
+readme = "README.md"
+packages = [{ include = "django_viewcomponent", from = "src" }]
+
+[tool.poetry.urls]
+Changelog = "https://github.com/rails-inspire-django/django-view-component/releases"
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+django = ">=3.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["setuptools", "poetry_core>=1.0"]
+build-backend = "poetry.core.masonry.api"

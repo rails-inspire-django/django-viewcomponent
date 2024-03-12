@@ -1,0 +1,18 @@
+{% load viewcomponent_tags %}
+{% if self.branch == 'a' %}
+    <p id="a">
+      {% if self.slot_a.filled %}
+        {{ self.slot_a.value }}
+      {% else %}
+        Default A
+      {% endif %}
+    </p>
+{% elif self.branch == 'b' %}
+    <p id="b">
+      {% if self.slot_b.filled %}
+        {{ self.slot_b.value }}
+      {% else %}
+        Default B
+      {% endif %}
+    </p>
+{% endif %}

@@ -1,0 +1,11 @@
+pre-commit==2.9.2
+tox==4.11.3
+tox-gh-actions==3.1.3
+
+django==4.2 # for local tests
+typing_extensions
+pytest
+pytest-django
+pytest-xdist
+pytest-mock
+jinja2

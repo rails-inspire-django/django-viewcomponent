@@ -1,0 +1,1 @@
+<svg>{{ self.name }}</svg>

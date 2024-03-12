@@ -1,0 +1,33 @@
+name: Runs tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  runtests:
+    runs-on: ubuntu-latest
+    env:
+      CHANNELS_REDIS: redis://localhost:6379/0
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10' ]
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install -r requirements-dev.txt
+      - name: Run tests
+        run: |
+          tox

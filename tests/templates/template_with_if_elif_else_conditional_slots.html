@@ -1,0 +1,24 @@
+{# Example from django-components/issues/98 #}
+{% load viewcomponent_tags %}
+<div class="frontmatter-component">
+    <div class="title">
+      {% if self.title.filled %}
+        {{ self.title.value }}
+      {% else %}
+        Title
+      {% endif %}
+    </div>
+
+    {% if self.subtitle.filled %}
+      <div class="subtitle">{{ self.subtitle.value }}</div>
+    {% endif %}
+
+    {% if self.alt_subtitle.filled %}
+      <div class="subtitle">{{ self.alt_subtitle.value }}</div>
+    {% endif %}
+
+    {% if not self.subtitle.filled and not self.alt_subtitle.filled %}
+      <div class="warning">Nothing filled!</div>
+    {% endif %}
+
+</div>
