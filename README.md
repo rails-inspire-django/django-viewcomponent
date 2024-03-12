@@ -1,5 +1,8 @@
 # README
 
+[![PyPI version](https://badge.fury.io/py/django-viewcomponent.svg)](https://badge.fury.io/py/django-viewcomponent)
+[![PyPI Supported Python Versions](https://img.shields.io/pypi/pyversions/django-viewcomponent.svg)](https://pypi.python.org/pypi/django-viewcomponent/)
+
 django-viewcomponent is a Django library that provides a way to create reusable components for your Django project.
 
 It is inspired by Rails [ViewComponent](https://viewcomponent.org/).
