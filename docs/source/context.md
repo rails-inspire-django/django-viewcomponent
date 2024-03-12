@@ -13,8 +13,6 @@ def get_context_data(self, **kwargs):
 
 Then you can get the `var2` in the component template via `{{ var2 }}`, just like other variables.
 
-## Special variables in the component context
-
-### Self
+## Self
 
 `self` points to the component instance itself, since each component has its own context, so each time the component is rendered, `self` is overwritten, and this would not cause any conflict.

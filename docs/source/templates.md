@@ -4,11 +4,11 @@
 
 You can use `template` variable to define the template inline.
 
-### Template file
+## Template file
 
 To use an external template file, set the `template_name` variable
 
-### Dynamic template
+## Dynamic template
 
 You can use `get_template_names` method to do dynamic template selection.
 
