@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.3
+## 1.0.4
 
 1. Add component `Preview` support
 
