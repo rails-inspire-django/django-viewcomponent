@@ -15,7 +15,7 @@ def preview_index_view(request):
     context = {
         'previews': previews
     }
-    return render(request, 'view_components/index.html', context)
+    return render(request, 'django_viewcomponent/index.html', context)
 
 
 def previews_view(request, preview_name):
@@ -23,7 +23,7 @@ def previews_view(request, preview_name):
     context = {
         'preview': preview
     }
-    return render(request, 'view_components/previews.html', context)
+    return render(request, 'django_viewcomponent/previews.html', context)
 
 
 def preview_view(request, preview_name, example_name):
@@ -41,4 +41,4 @@ def preview_view(request, preview_name, example_name):
         'preview_source': preview_source,
     }
 
-    return render(request, 'view_components/preview.html', context)
+    return render(request, 'django_viewcomponent/preview.html', context)

@@ -15,4 +15,5 @@ Topics
    slot.md
    templates.md
    context.md
+   preview.md
    testing.md
