@@ -1,0 +1,14 @@
+{% extends 'django_viewcomponent/base.html' %}
+
+{% block content %}
+  {% for preview_name, preview in previews.items %}
+    <h3>
+      <a href="{{ preview.url}}">{{ preview_name }}</a>
+    </h3>
+    <ul>
+      {% for example in preview.examples %}
+        <li><a href="{{ preview.url}}{{ example }}">{{ example }}</a></li>
+      {% endfor %}
+    </ul>
+  {% endfor %}
+{% endblock %}
