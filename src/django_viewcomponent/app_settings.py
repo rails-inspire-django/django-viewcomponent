@@ -9,5 +9,9 @@ class AppSettings:
     def PREVIEW_BASE(self):
         return self.settings.setdefault("preview_base", [])
 
+    @property
+    def SHOW_PREVIEWS(self):
+        return self.settings.setdefault("show_previews", True)
+
 
 app_settings = AppSettings()
