@@ -1,6 +1,13 @@
 import pytest
 from django_viewcomponent.preview import ViewComponentPreview
 from django.urls import reverse
+from django_viewcomponent import component
+
+
+@pytest.fixture(autouse=True)
+def register_component():
+    from tests.previews.simple_preview import ExampleComponent
+    component.registry.register("example", ExampleComponent)
 
 
 class TestBasicPreview:

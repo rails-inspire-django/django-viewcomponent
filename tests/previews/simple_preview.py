@@ -3,7 +3,6 @@ from django.template import Context, Template
 from django_viewcomponent import component
 
 
-@component.register("example")
 class ExampleComponent(component.Component):
     template = """
         <span title="{{ self.title }}">
