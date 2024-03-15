@@ -44,6 +44,10 @@ def pytest_configure():
             "django_viewcomponent",
             "tests.testapp",
         ],
+        ROOT_URLCONF="tests.testapp.urls",
+        VIEW_COMPONENTS={
+            "preview_base": ["previews"],
+        },
     )
 
 

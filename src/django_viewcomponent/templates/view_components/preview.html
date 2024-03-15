@@ -1,0 +1,11 @@
+{% extends 'view_components/base.html' %}
+
+{% block content %}
+  {{ preview_html }}
+
+  <div class="view-component-source-example">
+    <h2>Source:</h2>
+    <pre><code class="language-python">{{ preview_source|safe }}</code></pre>
+  </div>
+
+{% endblock %}

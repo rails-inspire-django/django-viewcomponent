@@ -84,11 +84,9 @@ class TestComponentContext:
 
         # ComponentNode do the same way
         comp = FilteredComponent(var1="test")
-        view_context = Context({"outer_variable": "test"})
-        comp.outer_context = view_context
-        component_context = comp.get_context_data()
+        comp.outer_context = Context({"outer_variable": "test"})
 
         assert_dom_equal(
             "<div>test</div><div>test</div><div>test</div>",
-            comp.render(component_context),
+            comp.render(comp.get_context_data()),
         )
