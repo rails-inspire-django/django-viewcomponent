@@ -9,10 +9,12 @@ Add below config to your Django settings
 ```python
 VIEW_COMPONENTS = {
     "preview_base": ["django_app/tests/previews"],
+    "show_previews": DEBUG,
 }
 ```
 
-`preview_base` is the base path for your previews. You can add multiple paths to it.
+1. `preview_base` is the base path for your previews. You can add multiple paths to it.
+2. `show_previews` is a boolean value, which is used to control whether to show the previews. It is `True` by default, here we set it with same value of `DEBUG`. So the previews will only be shown in the development environment.
 
 Add below url path to your Django urls
 
