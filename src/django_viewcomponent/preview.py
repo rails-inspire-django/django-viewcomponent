@@ -2,6 +2,7 @@ import re
 import inspect
 from django.urls import reverse
 from urllib.parse import urljoin
+from django_viewcomponent.app_settings import app_settings
 
 pattern = re.compile(r'(?<!^)(?=[A-Z])')
 
@@ -26,13 +27,14 @@ class ViewComponentPreview:
         pass
 
     def __init_subclass__(cls, **kwargs):
-        name = cls.__name__
-        name = name.replace("Preview", "")
-        new_name = camel_to_snake(name)
-        ViewComponentPreview.previews[new_name] = cls
-        cls.preview_name = new_name
-        cls.preview_view_component_path = inspect.getfile(cls)
-        cls.url = urljoin(reverse('django_viewcomponent:preview-index'), cls.preview_name + '/')
+        if app_settings.SHOW_PREVIEWS:
+            name = cls.__name__
+            name = name.replace("Preview", "")
+            new_name = camel_to_snake(name)
+            ViewComponentPreview.previews[new_name] = cls
+            cls.preview_name = new_name
+            cls.preview_view_component_path = inspect.getfile(cls)
+            cls.url = urljoin(reverse('django_viewcomponent:preview-index'), cls.preview_name + '/')
 
     @classmethod
     def examples(cls):

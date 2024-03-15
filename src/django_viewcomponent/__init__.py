@@ -6,6 +6,7 @@ from pathlib import Path
 
 from django.template.engine import Engine
 from django_viewcomponent.loaders import ComponentLoader
+from django_viewcomponent.app_settings import app_settings
 
 
 def autodiscover_components():
@@ -19,11 +20,11 @@ def autodiscover_components():
 
 
 def autodiscover_previews():
-    from django_viewcomponent.app_settings import app_settings
-    preview_base_ls = [Path(p) for p in app_settings.PREVIEW_BASE]
-    for directory in preview_base_ls:
-        for path in glob.iglob(str(directory / "**/*.py"), recursive=True):
-            import_component_file(path)
+    if app_settings.SHOW_PREVIEWS:
+        preview_base_ls = [Path(p) for p in app_settings.PREVIEW_BASE]
+        for directory in preview_base_ls:
+            for path in glob.iglob(str(directory / "**/*.py"), recursive=True):
+                import_component_file(path)
 
 
 def import_component_file(path):
