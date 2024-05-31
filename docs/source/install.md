@@ -4,7 +4,7 @@
 $ pip install django-viewcomponent
 ```
 
-Then add the app into INSTALLED_APPS in settings.py
+Then add the app into `INSTALLED_APPS` in settings.py
 
 ```python
 INSTALLED_APPS = [
@@ -38,7 +38,7 @@ TEMPLATES = [
 ]
 ```
 
-(**Optional**) To avoid loading the app in each template using ``` {% load viewcomponent_tags %} ```, you can add the tag as a 'builtin' in settings.py
+(**Optional**) To avoid loading the app in each template using ``` {% load viewcomponent_tags %} ```, you can add the tag as a `builtin` in settings.py
 
 ```python
 TEMPLATES = [
