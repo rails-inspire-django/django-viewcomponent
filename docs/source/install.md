@@ -38,7 +38,7 @@ TEMPLATES = [
 ]
 ```
 
-(**Optional**) To avoid loading the app in each template using ``` {% load viewcomponent_tags %} ```, you can add the tag as a 'builtin' in settings.py
+(**Optional**) To avoid loading the app in each template using ``` {% load viewcomponent_tags %} ```, you can add the tag as a `builtin` in settings.py
 
 ```python
 TEMPLATES = [
