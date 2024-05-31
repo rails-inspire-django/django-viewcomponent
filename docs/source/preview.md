@@ -83,7 +83,7 @@ Notes:
 
 ## Override Template
 
-In some cases, you might need to render HTML code which need work with CSS and JS. You can override the `preview` template to include them.
+In some cases, you might need to render HTML code which need work with your own CSS and JS. You can override the `preview` template to include them.
 
 Create *django_viewcomponent/preview.html* in the project `templates` directory
 
@@ -136,7 +136,3 @@ If we restart app and check on [http://127.0.0.1:8000/previews](http://127.0.0.1
 As you can see, the preview feature is very useful for us to develop and test the component in an isolated environment.
 
 You can even build a simplified version of the component library with it.
-
-## Override Templates
-
-You can also override the templates to fit your needs, please check the template files under `django_viewcomponent/templates/django_viewcomponent` to learn more.
