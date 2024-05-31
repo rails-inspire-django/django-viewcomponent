@@ -4,7 +4,7 @@
 $ pip install django-viewcomponent
 ```
 
-Then add the app into INSTALLED_APPS in settings.py
+Then add the app into `INSTALLED_APPS` in settings.py
 
 ```python
 INSTALLED_APPS = [

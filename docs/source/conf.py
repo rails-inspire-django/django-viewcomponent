@@ -61,3 +61,16 @@ exclude_patterns = []  # type: ignore
 # html_static_path = ['_static']
 html_theme = "furo"
 pygments_style = "sphinx"
+
+announcement_html = """
+<div class="">
+  Have questions, feedback, or just want to chat? Reach out to me on
+  <a href="https://twitter.com/michaelyinplus" target="_blank">
+    <strong>Twitter / X</strong>
+  </a>
+</div>
+"""
+
+html_theme_options = {
+    "announcement": announcement_html,
+}

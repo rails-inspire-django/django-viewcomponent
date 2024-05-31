@@ -19,10 +19,14 @@ VIEW_COMPONENTS = {
 Add below url path to your Django urls
 
 ```python
-path("previews/", include("django_viewcomponent.urls")),
-```
+from django.contrib import admin
+from django.urls import path, include
 
-So all the previews will work on the `/previews` path, I'd like to do that when `DEBUG` is `True`.
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path("previews/", include("django_viewcomponent.urls")),      # new
+]
+```
 
 ## Create a preview
 
@@ -43,26 +47,27 @@ from django_viewcomponent.preview import ViewComponentPreview
 
 
 class ModalComponentPreview(ViewComponentPreview):
-    def small_modal(self, **kwargs):
+    def default_modal(self, **kwargs):
         template = Template(
             """
             {% load viewcomponent_tags %}
 
-            {% component 'modal' size="sm" as component %}
-              {% call component.trigger %}
-                <button class="btn btn-blue" data-action="click->modal#open:prevent">Open Small Modal</button>
-              {% endcall %}
-
-              {% call component.body %}
-                <h2 class="mb-4 text-xl">Small Modal Content</h2>
-                <p class="mb-4">This is an example modal dialog box.</p>
-              {% endcall %}
-
-              {% call component.actions %}
-                <button class="btn btn-white" data-action="click->modal#close:prevent">Cancel</button>
-                <button class="btn btn-blue" data-action="click->modal#close:prevent">Close</button>
-              {% endcall %}
-            {% endcomponent %}
+            {% with modal_id='example' modal_title='Simple Test'%}
+              {% component 'modal' modal_id=modal_id modal_title=modal_title as modal_comp %}
+                {% call modal_comp.modal_trigger %}
+                  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{ modal_id }}">
+                    Launch demo modal
+                  </button>
+                {% endcall %}
+                {% call modal_comp.modal_body %}
+                  Modal Content
+                {% endcall %}
+                {% call modal_comp.modal_footer %}
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary">Save changes</button>
+                {% endcall %}
+              {% endcomponent %}
+            {% endwith %}
         """,
         )
 
@@ -72,23 +77,65 @@ class ModalComponentPreview(ViewComponentPreview):
 Notes:
 
 1. We create a `ModalComponentPreview`, which inherits from `ViewComponentPreview`.
-2. We defined a public method `small_modal`, which will be used to render the preview, and `small_modal` is the name of the preview.
-3. We can get `request.GET` from the `kwargs` parameter, and use it to render the preview.
-4. In most cases, we can create one preview class for one component, and create multiple public method for one preview.
+2. We defined a public method `default_modal`, which will be used to render the preview, and `default_modal` is the name of the preview, the returned value is `preview_html` in the `django_viewcomponent/preview.html`
+3. When Django server run, it will search files in the `preview_base` path, and render the preview by calling the methods, `default_modal` in this case.
+4. In most cases, you can create multiple methods (multiple previews) for one component to demonstrate how to use the component.
 
-That is it!
+## Override Template
+
+In some cases, you might need to render HTML code which need work with CSS and JS. You can override the `preview` template to include them.
+
+Create *django_viewcomponent/preview.html* in the project `templates` directory
+
+And this is an example
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.28.0/themes/prism.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+</head>
+<body>
+
+<div>
+  {{ preview_html }}
+</div>
+
+<div class="view-component-source-example">
+  <h2>Source:</h2>
+  <pre><code class="language-python">{{ preview_source }}</code></pre>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.28.0/prism.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.28.0/components/prism-python.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+        crossorigin="anonymous"></script>
+</body>
+</html>
+```
+
+1. We import Bootstrap CSS and JS to the page.
+2. `preview_html` is the HTML generated by the preview method.
+
+Now if we refresh the page and check again, the `preview` HTML should be rendered with Bootstrap CSS and JS.
+
+If you have other frontend assets such as Alpine.js, jQuery or CSS file, **you should remember to include them in this template file**.
 
 ## Check the preview
 
-If we check [http://127.0.0.1:8000/previews/](http://127.0.0.1:8000/previews/), all previews will be listed there.
+If we restart app and check on [http://127.0.0.1:8000/previews](http://127.0.0.1:8000/previews), we should be able to see the all previews, if we click the `default_modal` link, we should be able to see the preview of the component and the code.
 
-![](./images/preview-index.png)
+![](./images/modal-preview.png)
 
-If we check the `small_modal` preview, we will see the result in the browser.
+As you can see, the preview feature is very useful for us to develop and test the component in an isolated environment.
 
-![](./images/small-modal-preview.png)
-
-The great thing is, we can also see the source code of the preview, which helps us to understand how to use the component.
+You can even build a simplified version of the component library with it.
 
 ## Override Templates
 
