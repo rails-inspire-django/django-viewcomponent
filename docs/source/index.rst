@@ -18,3 +18,4 @@ Topics
    preview.md
    testing.md
    articles.md
+   faq.md

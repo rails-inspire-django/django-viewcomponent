@@ -131,7 +131,7 @@ If you have other frontend assets such as Alpine.js, jQuery or CSS file, **you s
 
 If we restart app and check on [http://127.0.0.1:8000/previews](http://127.0.0.1:8000/previews), we should be able to see the all previews, if we click the `default_modal` link, we should be able to see the preview of the component and the code.
 
-![](./images/modal-preview.png)
+![](./images/modal-preview.jpg)
 
 As you can see, the preview feature is very useful for us to develop and test the component in an isolated environment.
 
