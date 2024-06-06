@@ -1,21 +1,21 @@
-from django_viewcomponent.preview import ViewComponentPreview
 from django.template import Context, Template
+
 from django_viewcomponent import component
+from django_viewcomponent.preview import ViewComponentPreview
 
 
 class ExampleComponent(component.Component):
     template = """
         <span title="{{ self.title }}">
           {{ self.content }}
-        </span> 
+        </span>
     """
 
     def __init__(self, **kwargs):
-        self.title = kwargs['title']
+        self.title = kwargs["title"]
 
 
 class SimpleExampleComponentPreview(ViewComponentPreview):
-
     def with_title(self, title="default title", **kwargs):
         return title
 
@@ -33,7 +33,6 @@ class SimpleExampleComponentPreview(ViewComponentPreview):
         template = Template(
             """
             {% load viewcomponent_tags %}
-            
             {% component "example" title=title %}
             {% endcomponent %}
         """
