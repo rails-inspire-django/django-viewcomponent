@@ -1,4 +1,5 @@
 import re
+import os
 import inspect
 from django.urls import reverse
 from urllib.parse import urljoin
@@ -33,7 +34,7 @@ class ViewComponentPreview:
             new_name = camel_to_snake(name)
             ViewComponentPreview.previews[new_name] = cls
             cls.preview_name = new_name
-            cls.preview_view_component_path = inspect.getfile(cls)
+            cls.preview_view_component_path = os.path.abspath(inspect.getfile(cls))
             cls.url = urljoin(reverse('django_viewcomponent:preview-index'), cls.preview_name + '/')
 
     @classmethod

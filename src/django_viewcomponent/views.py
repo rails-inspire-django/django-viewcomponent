@@ -1,5 +1,6 @@
 from django_viewcomponent.preview import ViewComponentPreview
 from django.shortcuts import render
+from django.http import Http404
 
 
 def request_get_to_dict(request):
@@ -19,19 +20,27 @@ def preview_index_view(request):
 
 
 def previews_view(request, preview_name):
-    preview = ViewComponentPreview.previews[preview_name]
+    preview_cls = ViewComponentPreview.previews.get(preview_name, None)
+    if not preview_cls:
+        raise Http404
     context = {
-        'preview': preview
+        'preview': preview_cls
     }
     return render(request, 'django_viewcomponent/previews.html', context)
 
 
 def preview_view(request, preview_name, example_name):
-    preview_cls = ViewComponentPreview.previews[preview_name]
+    preview_cls = ViewComponentPreview.previews.get(preview_name, None)
+    if not preview_cls:
+        raise Http404
+    
     preview_instance = preview_cls()
 
     query_dict = request_get_to_dict(request)
-    fun = getattr(preview_instance, example_name)
+    fun = getattr(preview_instance, example_name, None)
+    if fun is None:
+        raise Http404
+
     preview_html = fun(**query_dict)
     preview_source = preview_instance.preview_source(example_name)
 
