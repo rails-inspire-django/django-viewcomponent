@@ -24,7 +24,7 @@ def previews_view(request, preview_name):
     if not preview_cls:
         raise Http404
     context = {
-        'preview': preview_cls
+        'preview_cls': preview_cls
     }
     return render(request, 'django_viewcomponent/previews.html', context)
 
