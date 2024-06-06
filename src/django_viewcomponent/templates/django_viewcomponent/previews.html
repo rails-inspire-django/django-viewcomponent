@@ -3,11 +3,11 @@
 {% block content %}
 
 <h3>
-  {{ preview.preview_name }}
+  {{ preview_cls.preview_name }}
 </h3>
 <ul>
-  {% for example in preview.examples %}
-    <li><a href="{{ preview.url}}{{ example }}">{{ example }}</a></li>
+  {% for example in preview_cls.examples %}
+    <li><a href="{{ preview_cls.url}}{{ example }}">{{ example }}</a></li>
   {% endfor %}
 </ul>
 

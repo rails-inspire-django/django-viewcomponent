@@ -8,7 +8,7 @@ Add below config to your Django settings
 
 ```python
 VIEW_COMPONENTS = {
-    "preview_base": ["django_app/tests/previews"],
+    "preview_base": ["previews"],
     "show_previews": DEBUG,
 }
 ```
@@ -31,15 +31,10 @@ urlpatterns = [
 ## Create a preview
 
 ```bash
-django_app/tests/
 ├── previews
 │   ├── modal_preview.py
 │   └── tab_preview.py
 ```
-
-Notes:
-
-1. I'd like to put all previews under the `tests` directory, but you can put them anywhere you like.
 
 ```python
 from django.template import Context, Template
@@ -83,9 +78,9 @@ Notes:
 
 ## Override Template
 
-In some cases, you might need to render HTML code which need work with your own CSS and JS. You can override the `preview` template to include them.
-
 Create *django_viewcomponent/preview.html* in the project `templates` directory
+
+This template file will be used to render the `preview`.
 
 And this is an example
 
@@ -125,7 +120,9 @@ And this is an example
 
 Now if we refresh the page and check again, the `preview` HTML should be rendered with Bootstrap CSS and JS.
 
-If you have other frontend assets such as Alpine.js, jQuery or CSS file, **you should remember to include them in this template file**.
+```{note}
+If you have other frontend assets such as Alpine.js, jQuery or CSS file, you should remember to include them in this template file `django_viewcomponent/preview.html`.
+```
 
 ## Check the preview
 
@@ -136,3 +133,9 @@ If we restart app and check on [http://127.0.0.1:8000/previews](http://127.0.0.1
 As you can see, the preview feature is very useful for us to develop and test the component in an isolated environment.
 
 You can even build a simplified version of the component library with it.
+
+## django-lookbook
+
+If you're seeking a visually appealing dashboard to efficiently manage previews, consider exploring [django-lookbook](https://github.com/rails-inspire-django/django-lookbook) for an enhanced experience.
+
+![](./images/lookbook_ui.png)

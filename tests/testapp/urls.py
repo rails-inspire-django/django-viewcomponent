@@ -1,7 +1,4 @@
 # Django
-from django.urls import path, include
+from django.urls import include, path
 
-
-urlpatterns = [
-    path("previews/", include("django_viewcomponent.urls"))
-]
+urlpatterns = [path("previews/", include("django_viewcomponent.urls"))]
