@@ -2,6 +2,10 @@
 
 django-viewcomponent is a Django library that provides a way to create reusable components for your Django project. It is inspired by [ViewComponent](https://viewcomponent.org/) for Ruby on Rails.
 
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="https://www.youtube.com/embed/QoetqsBCsbE?si=UhvtKpOLSCNcnIbW&amp;start=624" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+</div>
+
 ## What’s a django-viewcomponent
 
 django-viewcomponent is an evolution of the Django partial template, a django-viewcomponent is actually a Python object.
