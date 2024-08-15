@@ -7,7 +7,7 @@ django-viewcomponent is a Django library that provides a way to create reusable 
 
 It is inspired by Rails [ViewComponent](https://viewcomponent.org/).
 
-[![YouTube](http://i.ytimg.com/vi/QoetqsBCsbE/hqdefault.jpg)](https://www.youtube.com/watch?v=QoetqsBCsbE)
+[![YouTube](http://i.ytimg.com/vi/QoetqsBCsbE/hqdefault.jpg)](https://youtu.be/QoetqsBCsbE?si=28PCFCD4N4CyfKY7&t=624)
 
 ## Why use django-viewcomponent
 
