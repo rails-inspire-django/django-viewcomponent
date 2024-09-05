@@ -1017,3 +1017,40 @@ class TestFieldComponentParameter:
         <div>test 4</div>
         """
         assert_dom_equal(expected, rendered)
+
+
+class TestNameSpace:
+    @pytest.fixture(autouse=True)
+    def register_component(self):
+        # auto discover components and register
+        from django_viewcomponent import autodiscover_components
+
+        autodiscover_components()
+
+    def test_component_namespace(self):
+        template = Template(
+            """
+            {% load viewcomponent_tags %}
+            {% component 'testapp.example' %}
+            {% endcomponent %}
+            """
+        )
+        rendered = template.render(Context({}))
+        expected = """
+        <h1>Hello, World!</h1>
+        """
+        assert_dom_equal(expected, rendered)
+
+    def test_component_namespace_with_parameters(self):
+        template = Template(
+            """
+            {% load viewcomponent_tags %}
+            {% component 'testapp.example' name="MichaelYin"%}
+            {% endcomponent %}
+            """
+        )
+        rendered = template.render(Context({}))
+        expected = """
+        <h1>Hello, MichaelYin!</h1>
+        """
+        assert_dom_equal(expected, rendered)

@@ -15,6 +15,7 @@ Topics
    slot.md
    templates.md
    context.md
+   namespace.md
    preview.md
    testing.md
    articles.md
