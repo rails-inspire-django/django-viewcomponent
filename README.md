@@ -9,6 +9,18 @@ It is inspired by Rails [ViewComponent](https://viewcomponent.org/), which built
 
 For more insights into the problem it addresses and its design philosophy, check out [this video by GitHub Staff member Joel Hawksley](https://youtu.be/QoetqsBCsbE?si=28PCFCD4N4CyfKY7&t=624)
 
+## Use Component in Django Template
+
+You can create components and use them in Django templates.
+
+![Use Component in Django Template](.github/assets/component-in-template.png)
+
+## Use Component in Python
+
+Or you can create components and use them in pure Python code.
+
+![Use Component in Python](.github/assets/component-in-py.png)
+
 ## Why use django-viewcomponent
 
 ### Single responsibility

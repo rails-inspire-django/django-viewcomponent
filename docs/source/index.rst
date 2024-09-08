@@ -16,6 +16,7 @@ Topics
    templates.md
    context.md
    namespace.md
+   use_components_in_python.md
    preview.md
    testing.md
    articles.md

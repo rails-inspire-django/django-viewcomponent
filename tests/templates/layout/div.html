@@ -1,0 +1,3 @@
+<div {% if self.dom_id %}id="{{ self.dom_id }}"{% endif %} {% if self.css_class %}class="{{ self.css_class }}"{% endif %} >
+        {{ self.fields_html|safe }}
+</div>
