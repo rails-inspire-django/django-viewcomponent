@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.7
+
+1. Supports using components in pure Python code
+2. Add doc about the `NameSpace`
+
 ## 1.0.6
 
 1. Return 404 instead of raising exception if preview not found.
