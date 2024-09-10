@@ -146,6 +146,7 @@ class ComponentNode(Node):
 
         # create isolated context for component
         component.outer_context = Context(context.flatten())
+        component.outer_context.template = context.template
 
         # create slot fields
         component.create_slot_fields()

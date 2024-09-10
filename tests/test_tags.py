@@ -226,6 +226,39 @@ class TestComponentSlotsTemplateTag:
         """,
         )
 
+    def test_slotted_template_with_includes(self):
+        """
+        Use include tag inside call tag
+        """
+        component.registry.register(name="test1", component=SlottedComponent)
+        component.registry.register(name="test2", component=SimpleComponent)
+
+        template = Template(
+            """
+            {% load viewcomponent_tags %}
+            {% component "test1" as component %}
+                {% call component.header %}
+                  {% include "includes.html" %}
+                {% endcall %}
+                {% call component.main %}
+                    {% component "test2" variable="variable" %}{% endcomponent %}
+                {% endcall %}
+            {% endcomponent %}
+        """
+        )
+        rendered = template.render(Context({}))
+
+        assert_dom_equal(
+            rendered,
+            """
+            <custom-template>
+                <header>Included content</header>
+                <main>Variable: <strong>variable</strong></main>
+                <footer>Default footer</footer>
+            </custom-template>
+        """,
+        )
+
     def test_slotted_template_with_context_var(self):
         component.registry.register(name="test1", component=SlottedComponentWithContext)
 
