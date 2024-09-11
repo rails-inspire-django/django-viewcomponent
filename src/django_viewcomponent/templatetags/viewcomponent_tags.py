@@ -143,22 +143,22 @@ class ComponentNode(Node):
         )
         component.component_name = resolved_component_name
         component.component_target_var = self.target_var
+        component.component_context = context
 
-        # create isolated context for component
-        component.outer_context = Context(context.flatten())
+        # https://docs.djangoproject.com/en/5.1/ref/templates/api/#django.template.Context.push
+        with component.component_context.push():
+            # developer can add extra context data in this method
+            updated_context = component.get_context_data()
 
-        # create slot fields
-        component.create_slot_fields()
+            # create slot fields
+            component.create_slot_fields()
 
-        component.component_context = component.get_context_data()
+            # render children nodelist
+            component.content = self.nodelist.render(updated_context)
 
-        # render children nodelist
-        component.content = self.nodelist.render(component.component_context)
+            component.check_slot_fields()
 
-        component.check_slot_fields()
-
-        # render component
-        return component.render(component.component_context)
+            return component.render(updated_context)
 
 
 @register.tag(name="component")

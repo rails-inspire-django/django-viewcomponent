@@ -1,10 +1,16 @@
-from django.template import Context
+from typing import Optional
 
 from django_viewcomponent.component_registry import registry as component_registry
 
 
 class FieldValue:
-    def __init__(self, dict_data=None, component=None, parent_component=None, **kwargs):
+    def __init__(
+        self,
+        dict_data: dict,
+        component: Optional[str] = None,
+        parent_component=None,
+        **kwargs
+    ):
         self._dict_data = dict_data
         self._content = self._dict_data.pop("content", "")
         self._component = component
@@ -19,27 +25,23 @@ class FieldValue:
 
     def render(self):
         component_cls = component_registry.get(self._component)
-
         component = component_cls(
             **self._dict_data,
         )
         component.component_name = self._component
+        component.component_context = self._parent_component.component_context
 
-        # create isolated context for component
-        component.outer_context = Context(
-            self._parent_component.component_context.flatten()
-        )
+        with component.component_context.push():
+            updated_context = component.get_context_data()
 
-        # create slot fields
-        component.create_slot_fields()
+            # create slot fields
+            component.create_slot_fields()
 
-        component.component_context = component.get_context_data()
+            component.content = self._content
 
-        component.content = self._content
+            component.check_slot_fields()
 
-        component.check_slot_fields()
-
-        return component.render(component.component_context)
+            return component.render(updated_context)
 
 
 class BaseSlotField:
