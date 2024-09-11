@@ -69,9 +69,9 @@ class TestComponentContext:
     def test_component_with_extra_context_variables(self):
         class FilteredComponent(component.Component):
             template = """
-<div>{{ self.var1 }}</div>
-<div>{{ var2 }}</div>
-<div>{{ outer_variable }}</div>
+                <div>{{ self.var1 }}</div>
+                <div>{{ var2 }}</div>
+                <div>{{ outer_variable }}</div>
             """
 
             def __init__(self, var1):
@@ -84,7 +84,7 @@ class TestComponentContext:
 
         # ComponentNode do the same way
         comp = FilteredComponent(var1="test")
-        comp.outer_context = Context({"outer_variable": "test"})
+        comp.component_context = Context({"outer_variable": "test"})
 
         assert_dom_equal(
             "<div>test</div><div>test</div><div>test</div>",
