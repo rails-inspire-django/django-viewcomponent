@@ -108,15 +108,10 @@ class Component:
         )
         """
         parent_context = parent_context or {}
-        # create isolated context for component
-        if isinstance(parent_context, Context):
-            copied_context = Context(parent_context.flatten())
-        else:
-            copied_context = Context(dict(parent_context))
-
-        self.component_context = self.prepare_context(copied_context)
-        self.component_context = self.get_context_data()
-        return self.render(self.component_context)
+        self.component_context = self.prepare_context(parent_context)
+        with self.component_context.push():
+            updated_context = self.get_context_data()
+            return self.render(updated_context)
 
     def check_slot_fields(self):
         # check required slot fields
