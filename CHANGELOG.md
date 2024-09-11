@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.8
+
+1. Remove `outer_context` from component, using `context.push` to create isolated context for component.
+2. Fix bug of using `include` in `call` tag.
+
 ## 1.0.7
 
 1. Supports using components in pure Python code
