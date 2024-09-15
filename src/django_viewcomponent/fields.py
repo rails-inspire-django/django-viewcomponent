@@ -9,7 +9,7 @@ class FieldValue:
         dict_data: dict,
         component: Optional[str] = None,
         parent_component=None,
-        **kwargs
+        **kwargs,
     ):
         self._dict_data = dict_data
         self._content = self._dict_data.pop("content", "")
@@ -24,7 +24,16 @@ class FieldValue:
             return self.render()
 
     def render(self):
-        component_cls = component_registry.get(self._component)
+        from django_viewcomponent.component import Component
+
+        component_cls = None
+        if isinstance(self._component, str):
+            component_cls = component_registry.get(self._component)
+        elif issubclass(self._component, Component):
+            component_cls = self._component
+        else:
+            raise ValueError(f"Invalid component type {self._component}")
+
         component = component_cls(
             **self._dict_data,
         )
