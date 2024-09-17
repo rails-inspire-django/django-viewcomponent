@@ -4,22 +4,18 @@ from django_viewcomponent.component_registry import registry as component_regist
 class FieldValue:
     def __init__(
         self,
-        content: str,
+        nodelist,
         dict_data: dict,
         component: None,
         parent_component=None,
     ):
-        self._content = content or ""
+        self._nodelist = nodelist
         self._dict_data = dict_data
         self._component = component
         self._parent_component = parent_component
 
     def __str__(self):
-        if self._component is None:
-            return self._content
-        else:
-            # If the slot field is defined with component, then we will use the component to render
-            return self.render()
+        return self.render()
 
     def render(self):
         from django_viewcomponent.component import Component
@@ -67,7 +63,7 @@ class FieldValue:
             # create slot fields
             component.create_slot_fields()
 
-            component.content = self._content
+            component.content = self._nodelist.render(updated_context)
 
             component.check_slot_fields()
 
@@ -101,14 +97,14 @@ class BaseSlotField:
     def required(self):
         return self._required
 
-    def handle_call(self, content, **kwargs):
+    def handle_call(self, nodelist, **kwargs):
         raise NotImplementedError("You must implement the `handle_call` method.")
 
 
 class RendersOneField(BaseSlotField):
-    def handle_call(self, content, **kwargs):
+    def handle_call(self, nodelist, **kwargs):
         value_instance = FieldValue(
-            content=content,
+            nodelist=nodelist,
             dict_data={**kwargs},
             component=self._component,
             parent_component=self.parent_component,
@@ -119,9 +115,9 @@ class RendersOneField(BaseSlotField):
 
 
 class RendersManyField(BaseSlotField):
-    def handle_call(self, content, **kwargs):
+    def handle_call(self, nodelist, **kwargs):
         value_instance = FieldValue(
-            content=content,
+            nodelist=nodelist,
             dict_data={**kwargs},
             component=self._component,
             parent_component=self.parent_component,
