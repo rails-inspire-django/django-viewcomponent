@@ -25,9 +25,6 @@ class Component:
     # and you can get it using self.content
     content = ""
 
-    # the name of the component
-    component_name = None
-
     # the variable name of the component in the context
     component_target_var = None
 

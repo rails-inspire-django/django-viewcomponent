@@ -143,7 +143,6 @@ class ComponentNode(Node):
             *resolved_component_args,
             **resolved_component_kwargs,
         )
-        component.component_name = resolved_component_name
         component.component_target_var = self.target_var
         component.component_context = context
 
