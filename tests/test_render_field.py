@@ -98,7 +98,7 @@ class TestRenderFieldComponentParameterString:
         assert_dom_equal(expected, rendered)
 
 
-class BlogComponent(component.Component):
+class BlogComponent1(component.Component):
     class HeaderComponent(component.Component):
         def __init__(self, classes, **kwargs):
             self.classes = classes
@@ -140,7 +140,7 @@ class TestRenderFieldComponentParameterClass:
 
     @pytest.fixture(autouse=True)
     def register_component(self):
-        component.registry.register("blog", BlogComponent)
+        component.registry.register("blog", BlogComponent1)
 
     def test_field_component_parameter(self):
         for i in range(5):
@@ -273,7 +273,7 @@ class TestRenderFieldComponentParameterLambdaReturnString:
         assert_dom_equal(expected, rendered)
 
 
-class PostComponent(component.Component):
+class PostComponent2(component.Component):
     def __init__(self, post, **kwargs):
         self.post = post
 
@@ -305,7 +305,7 @@ class TestRenderFieldComponentParameterLambdaReturnInstance:
         header = RendersOneField(required=True, component="header")
         posts = RendersManyField(
             required=True,
-            component=lambda post: PostComponent(post=post),
+            component=lambda post: PostComponent2(post=post),
         )
 
         template = """
