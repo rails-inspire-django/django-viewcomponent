@@ -237,6 +237,14 @@ class PostComponent(component.Component):
     """
 ```
 
+## Separation of concerns
+
+The slot field and the `component` argument can help us build components with separation of concerns.
+
+With `component` argument, we can **connect** components together, in clean way.
+
+![](./images/blog-components.png)
+
 ## Component argument in slot field
 
 `component` in `RendersOneField` or `RendersManyField` supports many variable types.
