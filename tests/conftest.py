@@ -27,13 +27,13 @@ def pytest_configure():
                                 "django.template.loaders.app_directories.Loader",
                                 "django_viewcomponent.loaders.ComponentLoader",
                             ],
-                        )
+                        ),
                     ],
                     "builtins": [
                         "django_viewcomponent.templatetags.viewcomponent_tags",
                     ],
                 },
-            }
+            },
         ],
         INSTALLED_APPS=[
             "django.contrib.admin",

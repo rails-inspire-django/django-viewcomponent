@@ -17,7 +17,7 @@ sys.path.insert(0, str(here / ".." / ".." / "src"))
 
 # -- Project information -----------------------------------------------------
 project = "django-viewcomponent"
-copyright = f"{datetime.datetime.now().year}, Michael Yin"
+copyright = f"{datetime.datetime.now().year}, Michael Yin"  # noqa
 author = "Michael Yin"
 
 

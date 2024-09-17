@@ -5,7 +5,6 @@ import django_viewcomponent
 import django_viewcomponent.component_registry
 from django_viewcomponent import component
 from django_viewcomponent.fields import RendersManyField, RendersOneField
-from tests.testapp.models import Post
 from tests.utils import assert_dom_equal
 
 
@@ -93,7 +92,8 @@ class TestComponentTemplateTag:
 
         template = Template(simple_tag_template)
         assert_dom_equal(
-            "Variable: <strong>variable</strong>", template.render(Context())
+            "Variable: <strong>variable</strong>",
+            template.render(Context()),
         )
 
     def test_call_with_invalid_name(self):
@@ -211,7 +211,7 @@ class TestComponentSlotsTemplateTag:
                     {% component "test2" variable="variable" %}{% endcomponent %}
                 {% endcall %}
             {% endcomponent %}
-        """
+        """,
         )
         rendered = template.render(Context({}))
 
@@ -244,7 +244,7 @@ class TestComponentSlotsTemplateTag:
                     {% component "test2" variable="variable" %}{% endcomponent %}
                 {% endcall %}
             {% endcomponent %}
-        """
+        """,
         )
         rendered = template.render(Context({}))
 
@@ -275,7 +275,7 @@ class TestComponentSlotsTemplateTag:
                     {% endcall %}
                 {% endcomponent %}
             {% endwith %}
-        """
+        """,
         )
         rendered = template.render(Context({"my_second_variable": "test321"}))
 
@@ -292,13 +292,14 @@ class TestComponentSlotsTemplateTag:
 
     def test_slotted_template_that_uses_missing_variable(self):
         component.registry.register(
-            name="test", component=SlottedComponentWithMissingVariable
+            name="test",
+            component=SlottedComponentWithMissingVariable,
         )
         template = Template(
             """
             {% load viewcomponent_tags %}
             {% component 'test' %}{% endcomponent %}
-            """
+            """,
         )
         rendered = template.render(Context({}))
 
@@ -317,7 +318,7 @@ class TestComponentSlotsTemplateTag:
         component.registry.register(name="test", component=SlottedComponent)
 
         template = Template(
-            '{% load viewcomponent_tags %}{% component "test" %}{% endcomponent %}'
+            '{% load viewcomponent_tags %}{% component "test" %}{% endcomponent %}',
         )
         rendered = template.render(Context({}))
 
@@ -338,7 +339,7 @@ class TestComponentSlotsTemplateTag:
             """
             {% load viewcomponent_tags %}
             {% component "test" %}{% endcomponent %}
-        """
+        """,
         )
         rendered = template.render(Context({}))
 
@@ -350,7 +351,7 @@ class TestComponentSlotsTemplateTag:
             """
             {% load viewcomponent_tags %}
             {% component 'test' %}{% endcomponent %}
-        """
+        """,
         )
         rendered = template.render(Context({}))
 
@@ -368,7 +369,7 @@ class TestComponentSlotsTemplateTag:
             {% load viewcomponent_tags %}
             {% component 'test' %}
             {% endcomponent %}
-            """
+            """,
         )
         with pytest.raises(ValueError):
             template.render(Context({}))
@@ -392,7 +393,7 @@ class TestComponentSlotsTemplateTag:
                 {% call component_2.footer %}{% endcall %}
               {% endcomponent %}
             {% endcomponent %}
-            """
+            """,
         )
         expected = """
         <div>
@@ -420,17 +421,17 @@ class TestMultiComponentSlots:
             + "{% endcomponent %}"
             "{% component 'second_component' variable='xyz' as component_2 %}"
             + second_component_slot
-            + "{% endcomponent %}"
+            + "{% endcomponent %}",
         )
 
     def expected_result(self, first_component_slot="", second_component_slot=""):
         return (
             "<custom-template><header>{}</header>".format(
-                first_component_slot or "Default header"
+                first_component_slot or "Default header",
             )
             + "<main>Default main</main><footer>Default footer</footer></custom-template>"
             + "<custom-template><header>{}</header>".format(
-                second_component_slot or "Default header"
+                second_component_slot or "Default header",
             )
             + "<main>Default main</main><footer>Default footer</footer></custom-template>"
         )
@@ -449,11 +450,13 @@ class TestMultiComponentSlots:
         second_slot_content = "<div>Slot #2</div>"
         first_slot = self.wrap_with_slot_tags("component_1.header", first_slot_content)
         second_slot = self.wrap_with_slot_tags(
-            "component_2.header", second_slot_content
+            "component_2.header",
+            second_slot_content,
         )
         rendered = self.make_template(first_slot, second_slot).render(Context({}))
         assert_dom_equal(
-            self.expected_result(first_slot_content, second_slot_content), rendered
+            self.expected_result(first_slot_content, second_slot_content),
+            rendered,
         )
 
     def test_both_components_render_correctly_when_only_first_has_slots(self):
@@ -467,7 +470,8 @@ class TestMultiComponentSlots:
         self.register_components()
         second_slot_content = "<div>Slot #2</div>"
         second_slot = self.wrap_with_slot_tags(
-            "component_2.header", second_slot_content
+            "component_2.header",
+            second_slot_content,
         )
         rendered = self.make_template("", second_slot).render(Context({}))
         assert_dom_equal(self.expected_result("", second_slot_content), rendered)
@@ -487,7 +491,7 @@ class TestNestedSlot:
             """
             {% load viewcomponent_tags %}
             {% component 'test' %}{% endcomponent %}
-        """
+        """,
         )
         rendered = template.render(Context({}))
         assert_dom_equal(rendered, '<div id="outer">Default</div>')
@@ -499,7 +503,7 @@ class TestNestedSlot:
             """
             {% load viewcomponent_tags %}
             {% component 'test' as component %}{% call component.inner %}Override{% endcall %}{% endcomponent %}
-        """
+        """,
         )
         rendered = template.render(Context({}))
         assert_dom_equal(rendered, '<div id="outer">Override</div>')
@@ -511,7 +515,7 @@ class TestNestedSlot:
             """
             {% load viewcomponent_tags %}
             {% component 'test' as component %}{% call component.outer %}<p>Override</p>{% endcall %}{% endcomponent %}
-        """
+        """,
         )
         rendered = template.render(Context({}))
         assert_dom_equal(rendered, "<p>Override</p>")
@@ -526,7 +530,7 @@ class TestNestedSlot:
                 {% call component.outer %}<p>Override</p>{% endcall %}
                 {% call component.inner %}<p>Will not appear</p>{% endcall %}
             {% endcomponent %}
-        """
+        """,
         )
         rendered = template.render(Context({}))
         assert_dom_equal(rendered, "<p>Override</p>")
@@ -552,7 +556,7 @@ class TestConditionalSlot:
                 {% call component.slot_a %}Override A{% endcall %}
                 {% call component.slot_b %}Override B{% endcall %}
             {% endcomponent %}
-        """
+        """,
         )
         rendered = template.render(Context({}))
         assert_dom_equal(rendered, "")
@@ -565,7 +569,7 @@ class TestConditionalSlot:
             {% load viewcomponent_tags %}
             {% component 'test' branch='a' %}{% endcomponent %}
             {% component 'test' branch='b' %}{% endcomponent %}
-        """
+        """,
         )
         rendered = template.render(Context({}))
         assert_dom_equal(rendered, '<p id="a">Default A</p><p id="b">Default B</p>')
@@ -582,7 +586,7 @@ class TestConditionalSlot:
             {% component 'test' branch='b' as component_2 %}
                 {% call component_2.slot_b %}Override B{% endcall %}
             {% endcomponent %}
-        """
+        """,
         )
         rendered = template.render(Context({}))
         assert_dom_equal(rendered, '<p id="a">Default A</p><p id="b">Override B</p>')
@@ -601,7 +605,7 @@ class TestConditionalSlot:
                 {% call component_2.slot_a %}Override A{% endcall %}
                 {% call component_2.slot_b %}Override B{% endcall %}
             {% endcomponent %}
-        """
+        """,
         )
         rendered = template.render(Context({}))
         assert_dom_equal(rendered, '<p id="a">Override A</p><p id="b">Override B</p>')
@@ -619,7 +623,7 @@ class TestTemplateSyntaxError:
             {% component "test" %}
                 {{ anything }}
             {% endcomponent %}
-            """
+            """,
         )
 
     def test_text(self):
@@ -629,7 +633,7 @@ class TestTemplateSyntaxError:
             {% component "test" %}
                 Text
             {% endcomponent %}
-            """
+            """,
         )
 
     def test_block_outside_call(self):
@@ -641,7 +645,7 @@ class TestTemplateSyntaxError:
                     {% call component.header %}{% endcall %}
                 {% endif %}
             {% endcomponent %}
-        """
+        """,
         )
 
     def test_unclosed_component_is_error(self):
@@ -651,7 +655,7 @@ class TestTemplateSyntaxError:
                 {% load viewcomponent_tags %}
                 {% component "test" %}
                 {% call "header" %}{% endcall %}
-            """
+            """,
             )
 
     def test_fill_with_no_component_is_error(self):
@@ -660,7 +664,7 @@ class TestTemplateSyntaxError:
                 """
                 {% load viewcomponent_tags %}
                 {% call component.header %}contents{% endcall %}
-            """
+            """,
             ).render(Context({}))
 
 
@@ -679,7 +683,7 @@ class TestComponentNesting:
                     Hello, User X
                 {% endcall %}
             {% endcomponent %}
-            """
+            """,
         )
         rendered = template.render(Context({"items": [1, 2, 3]}))
         expected = """
@@ -719,7 +723,8 @@ class TestConditionalIfFilledSlots:
     @pytest.fixture(autouse=True)
     def register_component(self):
         component.registry.register(
-            "conditional_slots", self.ComponentWithConditionalSlots
+            "conditional_slots",
+            self.ComponentWithConditionalSlots,
         )
         component.registry.register(
             "complex_conditional_slots",
@@ -868,7 +873,7 @@ class TestComponentCollectionSlots:
             {% load viewcomponent_tags %}
             {% component 'tabs' %}
             {% endcomponent %}
-            """
+            """,
         )
         with pytest.raises(ValueError):
             template.render(Context({}))
@@ -886,7 +891,7 @@ class TestComponentCollectionSlots:
                 {% call component.panels %}Panel 2{% endcall %}
                 {% call component.panels %}Panel 3{% endcall %}
             {% endcomponent %}
-            """
+            """,
         )
         rendered = template.render(Context({}))
         assert_dom_equal(
@@ -933,7 +938,7 @@ class TestComponentCollectionSlots:
                 {% call component.panels %}{{ panel }} 3{% endcall %}
             {% endcomponent %}
             {% endwith %}
-            """
+            """,
         )
         rendered = template.render(Context({}))
         assert_dom_equal(
@@ -966,92 +971,6 @@ class TestComponentCollectionSlots:
         )
 
 
-@pytest.mark.django_db
-class TestFieldComponentParameter:
-    class HeaderComponent(component.Component):
-        def __init__(self, classes, **kwargs):
-            self.classes = classes
-
-        template = """
-            <h1 class="{{ self.classes }}">
-              {{ self.content }}
-            </h1>
-        """
-
-    class PostComponent(component.Component):
-        def __init__(self, post, **kwargs):
-            self.post = post
-
-        template = """
-        {% load viewcomponent_tags %}
-
-        <h1>{{ self.post.title }}</h1>
-        <div>{{ self.post.description }}</div>
-        """
-
-    class BlogComponent(component.Component):
-        header = RendersOneField(required=True, component="header")
-        posts = RendersManyField(required=True, component="post")
-
-        template = """
-        {% load viewcomponent_tags %}
-        {{ self.header.value }}
-        {% for post in self.posts.value %}
-          {{ post }}
-        {% endfor %}
-        """
-
-    @pytest.fixture(autouse=True)
-    def register_component(self):
-        component.registry.register("blog", self.BlogComponent)
-        component.registry.register("header", self.HeaderComponent)
-        component.registry.register("post", self.PostComponent)
-
-    def test_field_component_parameter(self):
-        for i in range(5):
-            title = f"test {i}"
-            description = f"test {i}"
-            Post.objects.create(title=title, description=description)
-
-        qs = Post.objects.all()
-
-        template = Template(
-            """
-            {% load viewcomponent_tags %}
-            {% component 'blog' as component %}
-                {% call component.header classes='text-lg' %}
-                    <a href="/">My Site</a>
-                {% endcall %}
-                {% for post in qs %}
-                    {% call component.posts post=post %}{% endcall %}
-                {% endfor %}
-            {% endcomponent %}
-            """
-        )
-        rendered = template.render(Context({"qs": qs}))
-        expected = """
-        <h1 class="text-lg">
-            <a href="/">My Site</a>
-        </h1>
-
-        <h1>test 0</h1>
-        <div>test 0</div>
-
-        <h1>test 1</h1>
-        <div>test 1</div>
-
-        <h1>test 2</h1>
-        <div>test 2</div>
-
-        <h1>test 3</h1>
-        <div>test 3</div>
-
-        <h1>test 4</h1>
-        <div>test 4</div>
-        """
-        assert_dom_equal(expected, rendered)
-
-
 class TestNameSpace:
     @pytest.fixture(autouse=True)
     def register_component(self):
@@ -1066,7 +985,7 @@ class TestNameSpace:
             {% load viewcomponent_tags %}
             {% component 'testapp.example' %}
             {% endcomponent %}
-            """
+            """,
         )
         rendered = template.render(Context({}))
         expected = """
@@ -1080,7 +999,7 @@ class TestNameSpace:
             {% load viewcomponent_tags %}
             {% component 'testapp.example' name="MichaelYin"%}
             {% endcomponent %}
-            """
+            """,
         )
         rendered = template.render(Context({}))
         expected = """

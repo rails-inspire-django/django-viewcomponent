@@ -35,7 +35,7 @@ class SimpleExampleComponentPreview(ViewComponentPreview):
             {% load viewcomponent_tags %}
             {% component "example" title=title %}
             {% endcomponent %}
-        """
+        """,
         )
 
         # pass the title from the URL querystring to the context

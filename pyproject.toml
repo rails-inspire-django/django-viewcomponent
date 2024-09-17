@@ -20,3 +20,53 @@ django = ">=3.0"
 [build-system]
 requires = ["setuptools", "poetry_core>=1.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+lint.ignore = [
+    # https://docs.astral.sh/ruff/rules/
+    "ANN",
+    "D",
+    "ARG",
+    "RUF",
+    "TRY",
+    "PTH",
+    "PGH",
+    "N",
+    "S",
+    "EM",
+    "ERA",
+    "RET",
+    "PERF",
+    "G",
+    "PERF",
+    "TCH",
+    "TD",
+    "FIX",
+    "FBT",
+
+    "E501",
+    "PLR2004",
+    "PT004",
+    "PLR5501",
+    "A002",
+    "BLE001",
+    "B904",
+    "SLF001",
+    "DJ001",
+    "DJ008",
+    "INP001",
+    "I001",
+    "FA100",
+    "FA102",
+    "SIM118",
+    "UP031",
+    "PT011",
+]
+lint.select = ["ALL"]
+exclude = ["migrations"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+
+[tool.black]
+target_version = ['py310']

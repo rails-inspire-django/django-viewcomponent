@@ -6,13 +6,13 @@ from .utils import assert_select
 class TestLayoutComponents:
     def test_html(self):
         html = HTML("{% if saved %}Data saved{% endif %}").render_from_parent_context(
-            {"saved": True}
+            {"saved": True},
         )
         assert "Data saved" in html
 
         # step_field and step0 not defined
         html = HTML(
-            '<input type="hidden" name="{{ step_field }}" value="{{ step0 }}" />'
+            '<input type="hidden" name="{{ step_field }}" value="{{ step0 }}" />',
         ).render_from_parent_context()
         assert_select(html, "input")
 

@@ -35,7 +35,7 @@ class TestBasicPreview:
             reverse(
                 "django_viewcomponent:previews",
                 kwargs={"preview_name": "simple_example_component"},
-            )
+            ),
         )
 
         assert response.status_code == 200
@@ -49,7 +49,7 @@ class TestBasicPreview:
                     "preview_name": "simple_example_component",
                     "example_name": "with_title",
                 },
-            )
+            ),
         )
 
         assert response.status_code == 200

@@ -25,9 +25,6 @@ class Component:
     # and you can get it using self.content
     content = ""
 
-    # the name of the component
-    component_name = None
-
     # the variable name of the component in the context
     component_target_var = None
 
@@ -63,7 +60,7 @@ class Component:
 
         raise ImproperlyConfigured(
             f"Either 'template_name' or 'template' must be set for Component {type(self).__name__}."
-            f"Note: this attribute is not required if you are overriding the class's `get_template*()` methods."
+            f"Note: this attribute is not required if you are overriding the class's `get_template*()` methods.",
         )
 
     def prepare_context(

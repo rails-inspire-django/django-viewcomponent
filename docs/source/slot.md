@@ -118,9 +118,9 @@ Notes:
 <a href="/">Post 2</a>
 ```
 
-## Linking slots with other component
+## Connect other component in the slot
 
-This is a very powerful feature, please read it carefully.
+This is the **killer feature**, so please read it carefully.
 
 Let's update the `BlogComponent` again
 
@@ -160,7 +160,7 @@ class BlogComponent(component.Component):
 Notes:
 
 1. We added a `HeaderComponent`, which accept a `classes` argument
-2. `header = RendersOneField(required=True, component='header')` means when `{{ self.header.value }}` is rendered, it would use the `HeaderComponent` to render the content.
+2. `header = RendersOneField(required=True, component='header')` means when `{{ self.header.value }}` is rendered, it would use the `HeaderComponent` component to render the content.
 
 ```django
 {% component "blog" as blog_component %}
@@ -235,4 +235,110 @@ class PostComponent(component.Component):
 
     <h1>{{ self.post.title }}</h1>
     """
+```
+
+## Separation of concerns
+
+The slot field and the `component` argument can help us build components with separation of concerns.
+
+With `component` argument, we can **connect** components together, in clean way.
+
+![](./images/blog-components.png)
+
+## Component argument in slot field
+
+`component` in `RendersOneField` or `RendersManyField` supports many variable types.
+
+### Component registered name
+
+```python
+header = RendersOneField(required=True, component="header")
+```
+
+### Component class
+
+```python
+class BlogComponent(component.Component):
+    class HeaderComponent(component.Component):
+        def __init__(self, classes, **kwargs):
+            self.classes = classes
+
+        template = """
+            <h1 class="{{ self.classes }}">
+              {{ self.content }}
+            </h1>
+        """
+
+    class PostComponent(component.Component):
+        def __init__(self, post, **kwargs):
+            self.post = post
+
+        template = """
+        {% load viewcomponent_tags %}
+
+        <h1>{{ self.post.title }}</h1>
+        <div>{{ self.post.description }}</div>
+        """
+
+    header = RendersOneField(required=True, component=HeaderComponent)
+    posts = RendersManyField(required=True, component=PostComponent)
+
+    template = """
+    {% load viewcomponent_tags %}
+    {{ self.header.value }}
+    {% for post in self.posts.value %}
+      {{ post }}
+    {% endfor %}
+    """
+```
+
+### Function which return string
+
+If one component is very simple, we can use a function or lambda to return string.
+
+```python
+class BlogComponent(component.Component):
+    header = RendersOneField(required=True, component="header")
+    posts = RendersManyField(
+        required=True,
+        component=lambda post, **kwargs: mark_safe(
+            f"""
+            <h1>{post.title}</h1>
+            <div>{post.description}</div>
+        """,
+        ),
+    )
+
+    template = """
+    {% load viewcomponent_tags %}
+    {{ self.header.value }}
+    {% for post in self.posts.value %}
+      {{ post }}
+    {% endfor %}
+    """
+```
+
+Notes:
+
+1. Here we use lambda function to return string from the `post` variable, so we do not need to create a Component.
+
+### Function which return component instance
+
+We can use function to return instance of a component.
+
+```python
+class BlogComponent(component.Component):
+    header = RendersOneField(required=True, component="header")
+    posts = RendersManyField(
+        required=True,
+        component=lambda post: PostComponent(post=post),
+    )
+
+    template = """
+        {% load viewcomponent_tags %}
+        {{ self.header.value }}
+        {% for post in self.posts.value %}
+          {{ post }}
+        {% endfor %}
+        """
 ```
