@@ -44,7 +44,7 @@ def assert_select(content, selector, equality=True, message=None, **tests):
     return doc.assert_select(selector, equality=equality, message=message, **tests)
 
 
-class Page(object):
+class Page:
     """
     https://github.com/aroberts/assert-select
 
@@ -54,7 +54,8 @@ class Page(object):
 
     def __init__(self, content=None, filename=None):
         if filename:
-            content = open(filename)
+            with open(filename) as f:
+                content = f.read()
         self.doc = BeautifulSoup(content, "html.parser")
 
     def __repr__(self):
@@ -67,7 +68,7 @@ class Page(object):
         """
         return self.doc.select(selector)
 
-    def assert_select(self, selector, equality=True, message=None, **tests):
+    def assert_select(self, selector, equality=True, message=None, **tests):  # noqa
         """
         Asserts that a css selector captures data from this Page, and
         that that data passes the test presented by the equality specifier.
@@ -96,16 +97,16 @@ class Page(object):
 
         # set up tests
         equality_type = type(equality)
-        if equality_type == bool:
+        if equality_type == bool:  # noqa
             if equality:
                 tests["minimum"] = 1
             else:
                 tests["count"] = 0
-        elif equality_type == int:
+        elif equality_type == int:  # noqa
             tests["count"] = equality
-        elif equality_type in (str, re_type):
+        elif equality_type in (str, re_type):  # noqa
             tests["text"] = equality
-        elif equality_type == list:
+        elif equality_type == list:  # noqa
             tests["maximim"] = max(equality)
             tests["minimum"] = min(equality)
         else:
@@ -119,7 +120,7 @@ class Page(object):
         elements = self.css_select(selector)
         if "text" in tests:
             match_with = tests["text"]
-            if type(match_with) == str:
+            if type(match_with) == str:  # noqa
                 filtered_elements = [e for e in elements if match_with in e.string]
             else:
                 filtered_elements = [e for e in elements if match_with.match(e.string)]

@@ -1,18 +1,16 @@
-from typing import Optional
-
 from django_viewcomponent.component_registry import registry as component_registry
 
 
 class FieldValue:
     def __init__(
         self,
+        content: str,
         dict_data: dict,
-        component: Optional[str] = None,
+        component: None,
         parent_component=None,
-        **kwargs,
     ):
+        self._content = content or ""
         self._dict_data = dict_data
-        self._content = self._dict_data.pop("content", "")
         self._component = component
         self._parent_component = parent_component
 
@@ -26,18 +24,41 @@ class FieldValue:
     def render(self):
         from django_viewcomponent.component import Component
 
-        component_cls = None
         if isinstance(self._component, str):
-            component_cls = component_registry.get(self._component)
-        elif issubclass(self._component, Component):
-            component_cls = self._component
-        else:
-            raise ValueError(f"Invalid component type {self._component}")
+            return self._render_for_component_cls(
+                component_registry.get(self._component),
+            )
+        elif not isinstance(self._component, type) and callable(self._component):
+            # self._component is function
+            callable_component = self._component
+            result = callable_component(**self._dict_data)
 
+            if isinstance(result, str):
+                return result
+            elif isinstance(result, Component):
+                # render component instance
+                return self._render_for_component_instance(result)
+            else:
+                raise ValueError(
+                    f"Callable slot component must return str or Component instance. Got {result}",
+                )
+        elif isinstance(self._component, type) and issubclass(
+            self._component,
+            Component,
+        ):
+            # self._component is Component class
+            return self._render_for_component_cls(self._component)
+        else:
+            raise ValueError(f"Invalid component variable {self._component}")
+
+    def _render_for_component_cls(self, component_cls):
         component = component_cls(
             **self._dict_data,
         )
-        component.component_name = self._component
+
+        return self._render_for_component_instance(component)
+
+    def _render_for_component_instance(self, component):
         component.component_context = self._parent_component.component_context
 
         with component.component_context.push():
@@ -86,13 +107,9 @@ class BaseSlotField:
 
 class RendersOneField(BaseSlotField):
     def handle_call(self, content, **kwargs):
-        value_dict = {
-            "content": content,
-            "parent_component": self.parent_component,
-            **kwargs,
-        }
         value_instance = FieldValue(
-            dict_data=value_dict,
+            content=content,
+            dict_data={**kwargs},
             component=self._component,
             parent_component=self.parent_component,
         )
@@ -103,13 +120,9 @@ class RendersOneField(BaseSlotField):
 
 class RendersManyField(BaseSlotField):
     def handle_call(self, content, **kwargs):
-        value_dict = {
-            "content": content,
-            "parent_component": self.parent_component,
-            **kwargs,
-        }
         value_instance = FieldValue(
-            dict_data=value_dict,
+            content=content,
+            dict_data={**kwargs},
             component=self._component,
             parent_component=self.parent_component,
         )

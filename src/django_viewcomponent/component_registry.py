@@ -6,7 +6,7 @@ class NotRegistered(Exception):
     pass
 
 
-class ComponentRegistry(object):
+class ComponentRegistry:
     def __init__(self):
         self._registry = {}  # component name -> component_class mapping
 
@@ -14,7 +14,7 @@ class ComponentRegistry(object):
         existing_component = self._registry.get(name)
         if existing_component and existing_component.class_hash != component.class_hash:
             raise AlreadyRegistered(
-                'The component "%s" has already been registered' % name
+                'The component "%s" has already been registered' % name,
             )
         self._registry[name] = component
 

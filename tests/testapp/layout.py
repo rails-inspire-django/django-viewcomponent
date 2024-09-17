@@ -21,7 +21,7 @@ class Div(component.Component):
             [
                 child_component.render_from_parent_context(context)
                 for child_component in self.fields
-            ]
+            ],
         )
         return context
 

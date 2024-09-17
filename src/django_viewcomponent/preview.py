@@ -42,7 +42,8 @@ class ViewComponentPreview:
             cls.preview_name = new_name
             cls.preview_view_component_path = os.path.abspath(inspect.getfile(cls))
             cls.url = urljoin(
-                reverse("django_viewcomponent:preview-index"), cls.preview_name + "/"
+                reverse("django_viewcomponent:preview-index"),
+                cls.preview_name + "/",
             )
 
     @classmethod

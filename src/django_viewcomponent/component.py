@@ -63,7 +63,7 @@ class Component:
 
         raise ImproperlyConfigured(
             f"Either 'template_name' or 'template' must be set for Component {type(self).__name__}."
-            f"Note: this attribute is not required if you are overriding the class's `get_template*()` methods."
+            f"Note: this attribute is not required if you are overriding the class's `get_template*()` methods.",
         )
 
     def prepare_context(

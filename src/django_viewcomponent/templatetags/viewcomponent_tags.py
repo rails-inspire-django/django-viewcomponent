@@ -73,14 +73,14 @@ class CallNode(Node):
 
         if "content" in resolved_kwargs:
             raise ValueError(
-                "The 'content' kwarg is reserved and cannot be passed in component call tag"
+                "The 'content' kwarg is reserved and cannot be passed in component call tag",
             )
 
         resolved_kwargs["content"] = content
 
         component_token, field_token = self.args[0].token.split(".")
         component_instance = FilterExpression(component_token, self.parser).resolve(
-            context
+            context,
         )
         if not component_instance:
             raise ValueError(f"Component {component_token} not found in context")
@@ -88,7 +88,7 @@ class CallNode(Node):
         field = getattr(component_instance, field_token, None)
         if not field:
             raise ValueError(
-                f"Field {field_token} not found in component {component_token}"
+                f"Field {field_token} not found in component {component_token}",
             )
 
         if isinstance(field, BaseSlotField):
@@ -115,7 +115,9 @@ class ComponentNode(Node):
         return "<ComponentNode: %s. Contents: %r>" % (
             self.name_fexp,
             getattr(
-                self, "nodelist", None
+                self,
+                "nodelist",
+                None,
             ),  # 'nodelist' attribute only assigned later.
         )
 
@@ -185,7 +187,9 @@ def do_component(parser, token):
         bits = bits[:-2]
 
     component_name, context_args, context_kwargs = parse_component_with_arguments(
-        parser, bits, "component"
+        parser,
+        bits,
+        "component",
     )
     nodelist: NodeList = parser.parse(parse_until=["endcomponent"])
     parser.delete_first_token()
@@ -217,7 +221,7 @@ def parse_component_with_arguments(parser, bits, tag_name):
 
     if tag_name != tag_args[0].token:
         raise RuntimeError(
-            f"Internal error: Expected tag_name to be {tag_name}, but it was {tag_args[0].token}"
+            f"Internal error: Expected tag_name to be {tag_name}, but it was {tag_args[0].token}",
         )
     if len(tag_args) > 1:
         # At least one position arg, so take the first as the component name
@@ -226,7 +230,7 @@ def parse_component_with_arguments(parser, bits, tag_name):
         context_kwargs = tag_kwargs
     else:
         raise TemplateSyntaxError(
-            f"Call the '{tag_name}' tag with a component name as the first parameter"
+            f"Call the '{tag_name}' tag with a component name as the first parameter",
         )
 
     return component_name, context_args, context_kwargs
