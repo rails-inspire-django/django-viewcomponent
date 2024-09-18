@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.9
+
+1. Make `comopnent` argument in `Renders Fields` supports component registered name, component class, and function.
+2. Remove `component_name` from `component` class.
+3. Update the rendering logic to make it consistent.
+
 ## 1.0.8
 
 1. Remove `outer_context` from component, using `context.push` to create isolated context for component.
