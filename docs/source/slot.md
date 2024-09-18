@@ -122,6 +122,8 @@ Notes:
 
 This is the **killer feature**, so please read it carefully.
 
+### Component argument in RendersOneField
+
 Let's update the `BlogComponent` again
 
 ```python
@@ -198,7 +200,7 @@ Notes:
 1. We do not need to store the `classes` to the `BlogComponent` and then pass it to the `HeaderComponent`, just set `component='header'` in the `RendersOneField` field, the `HeaderComponent` would receive the `classes` argument automatically
 2. If you check the template code in the `BlogComponent`, `{{ self.header.value }}` ia very simple to help you understand what it is.
 
-## Component with RendersManyField
+### Component argument in RendersManyField
 
 If you have
 
@@ -245,14 +247,48 @@ With `component` argument, we can **connect** components together, in clean way.
 
 ![](./images/blog-components.png)
 
-## Component argument in slot field
-
-`component` in `RendersOneField` or `RendersManyField` supports many variable types.
+## Component argument in slot fields supports different variable types
 
 ### Component registered name
 
 ```python
-header = RendersOneField(required=True, component="header")
+@component.register("header")
+class HeaderComponent(component.Component):
+    def __init__(self, classes, **kwargs):
+        self.classes = classes
+
+    template = """
+        <h1 class="{{ self.classes }}">
+          {{ self.content }}
+        </h1>
+    """
+
+
+@component.register("post")
+class PostComponent(component.Component):
+    def __init__(self, post, **kwargs):
+        self.post = post
+
+    template = """
+        {% load viewcomponent_tags %}
+
+        <h1>{{ self.post.title }}</h1>
+        <div>{{ self.post.description }}</div>
+        """
+
+
+@component.register("blog")
+class BlogComponent(component.Component):
+    header = RendersOneField(required=True, component="header")
+    posts = RendersManyField(required=True, component="post")
+
+    template = """
+        {% load viewcomponent_tags %}
+        {{ self.header.value }}
+        {% for post in self.posts.value %}
+          {{ post }}
+        {% endfor %}
+        """
 ```
 
 ### Component class
@@ -301,7 +337,7 @@ class BlogComponent(component.Component):
     header = RendersOneField(required=True, component="header")
     posts = RendersManyField(
         required=True,
-        component=lambda post, **kwargs: mark_safe(
+        component=lambda self, post, **kwargs: mark_safe(
             f"""
             <h1>{post.title}</h1>
             <div>{post.description}</div>
@@ -321,17 +357,18 @@ class BlogComponent(component.Component):
 Notes:
 
 1. Here we use lambda function to return string from the `post` variable, so we do not need to create a Component.
+2. We can still use `self.xxx` to access value of the blog component.
 
 ### Function which return component instance
 
-We can use function to return instance of a component.
+We can use function to return instance of a component, this is useful when we need to pass some special default values to the other component.
 
 ```python
 class BlogComponent(component.Component):
     header = RendersOneField(required=True, component="header")
     posts = RendersManyField(
         required=True,
-        component=lambda post: PostComponent(post=post),
+        component=lambda post, **kwargs: PostComponent(post=post),
     )
 
     template = """

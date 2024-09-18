@@ -65,8 +65,6 @@ class CallNode(Node):
         raise NotImplementedError
 
     def render(self, context):
-        content = self.nodelist.render(context)
-
         resolved_kwargs = {
             key: safe_resolve(kwarg, context) for key, kwarg in self.kwargs.items()
         }
@@ -76,7 +74,7 @@ class CallNode(Node):
                 "The 'content' kwarg is reserved and cannot be passed in component call tag",
             )
 
-        resolved_kwargs["content"] = content
+        resolved_kwargs["nodelist"] = self.nodelist
 
         component_token, field_token = self.args[0].token.split(".")
         component_instance = FilterExpression(component_token, self.parser).resolve(

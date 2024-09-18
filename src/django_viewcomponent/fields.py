@@ -4,22 +4,18 @@ from django_viewcomponent.component_registry import registry as component_regist
 class FieldValue:
     def __init__(
         self,
-        content: str,
+        nodelist,
         dict_data: dict,
         component: None,
         parent_component=None,
     ):
-        self._content = content or ""
+        self._nodelist = nodelist
         self._dict_data = dict_data
         self._component = component
         self._parent_component = parent_component
 
     def __str__(self):
-        if self._component is None:
-            return self._content
-        else:
-            # If the slot field is defined with component, then we will use the component to render
-            return self.render()
+        return self.render()
 
     def render(self):
         from django_viewcomponent.component import Component
@@ -31,7 +27,10 @@ class FieldValue:
         elif not isinstance(self._component, type) and callable(self._component):
             # self._component is function
             callable_component = self._component
-            result = callable_component(**self._dict_data)
+            result = callable_component(
+                self=self._parent_component,
+                **self._dict_data,
+            )
 
             if isinstance(result, str):
                 return result
@@ -48,6 +47,8 @@ class FieldValue:
         ):
             # self._component is Component class
             return self._render_for_component_cls(self._component)
+        elif self._component is None:
+            return self._nodelist.render(self._parent_component.component_context)
         else:
             raise ValueError(f"Invalid component variable {self._component}")
 
@@ -67,7 +68,7 @@ class FieldValue:
             # create slot fields
             component.create_slot_fields()
 
-            component.content = self._content
+            component.content = self._nodelist.render(updated_context)
 
             component.check_slot_fields()
 
@@ -101,14 +102,14 @@ class BaseSlotField:
     def required(self):
         return self._required
 
-    def handle_call(self, content, **kwargs):
+    def handle_call(self, nodelist, **kwargs):
         raise NotImplementedError("You must implement the `handle_call` method.")
 
 
 class RendersOneField(BaseSlotField):
-    def handle_call(self, content, **kwargs):
+    def handle_call(self, nodelist, **kwargs):
         value_instance = FieldValue(
-            content=content,
+            nodelist=nodelist,
             dict_data={**kwargs},
             component=self._component,
             parent_component=self.parent_component,
@@ -118,17 +119,35 @@ class RendersOneField(BaseSlotField):
         self._value = value_instance
 
 
+class FieldValueListWrapper:
+    """
+    This helps render FieldValue eagerly when component template has
+    {% for panel in self.panels.value %}, this can avoid issues if `panel` of the for loop statement
+    # override context variables in some cases.
+    """
+
+    def __init__(self):
+        self.data = []
+
+    def append(self, value):
+        self.data.append(value)
+
+    def __iter__(self):
+        for field_value in self.data:
+            yield field_value.render()
+
+
 class RendersManyField(BaseSlotField):
-    def handle_call(self, content, **kwargs):
+    def handle_call(self, nodelist, **kwargs):
         value_instance = FieldValue(
-            content=content,
+            nodelist=nodelist,
             dict_data={**kwargs},
             component=self._component,
             parent_component=self.parent_component,
         )
 
         if self._value is None:
-            self._value = []
+            self._value = FieldValueListWrapper()
 
         self._value.append(value_instance)
         self._filled = True
