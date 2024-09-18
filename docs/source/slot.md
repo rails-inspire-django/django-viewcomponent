@@ -337,7 +337,7 @@ class BlogComponent(component.Component):
     header = RendersOneField(required=True, component="header")
     posts = RendersManyField(
         required=True,
-        component=lambda post, **kwargs: mark_safe(
+        component=lambda self, post, **kwargs: mark_safe(
             f"""
             <h1>{post.title}</h1>
             <div>{post.description}</div>
@@ -357,17 +357,18 @@ class BlogComponent(component.Component):
 Notes:
 
 1. Here we use lambda function to return string from the `post` variable, so we do not need to create a Component.
+2. We can still use `self.xxx` to access value of the blog component.
 
 ### Function which return component instance
 
-We can use function to return instance of a component.
+We can use function to return instance of a component, this is useful when we need to pass some special default values to the other component.
 
 ```python
 class BlogComponent(component.Component):
     header = RendersOneField(required=True, component="header")
     posts = RendersManyField(
         required=True,
-        component=lambda post: PostComponent(post=post),
+        component=lambda post, **kwargs: PostComponent(post=post),
     )
 
     template = """
