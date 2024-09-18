@@ -27,7 +27,10 @@ class FieldValue:
         elif not isinstance(self._component, type) and callable(self._component):
             # self._component is function
             callable_component = self._component
-            result = callable_component(**self._dict_data)
+            result = callable_component(
+                self=self._parent_component,
+                **self._dict_data,
+            )
 
             if isinstance(result, str):
                 return result
