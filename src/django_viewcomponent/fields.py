@@ -47,6 +47,8 @@ class FieldValue:
         ):
             # self._component is Component class
             return self._render_for_component_cls(self._component)
+        elif self._component is None:
+            return self._nodelist.render(self._parent_component.component_context)
         else:
             raise ValueError(f"Invalid component variable {self._component}")
 
@@ -117,6 +119,24 @@ class RendersOneField(BaseSlotField):
         self._value = value_instance
 
 
+class FieldValueListWrapper:
+    """
+    This helps render FieldValue eagerly when component template has
+    {% for panel in self.panels.value %}, this can avoid issues if `panel` of the for loop statement
+    # override context variables in some cases.
+    """
+
+    def __init__(self):
+        self.data = []
+
+    def append(self, value):
+        self.data.append(value)
+
+    def __iter__(self):
+        for field_value in self.data:
+            yield field_value.render()
+
+
 class RendersManyField(BaseSlotField):
     def handle_call(self, nodelist, **kwargs):
         value_instance = FieldValue(
@@ -127,7 +147,7 @@ class RendersManyField(BaseSlotField):
         )
 
         if self._value is None:
-            self._value = []
+            self._value = FieldValueListWrapper()
 
         self._value.append(value_instance)
         self._filled = True
