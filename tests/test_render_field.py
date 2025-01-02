@@ -10,12 +10,6 @@ from tests.utils import assert_dom_equal
 
 @pytest.mark.django_db
 class TestRenderFieldComponentContextLogic:
-    """
-    HeaderComponent.get_context_data add extra context data
-
-    We can still access the value via {{ site_name }}
-    """
-
     class HeaderComponent(component.Component):
         def __init__(self, classes, **kwargs):
             self.classes = classes
@@ -43,14 +37,18 @@ class TestRenderFieldComponentContextLogic:
         """
 
     class BlogComponent(component.Component):
-        header = RendersOneField(required=True, component="header")
-        posts = RendersManyField(required=True, component="post")
+        header = RendersOneField(component="header")
+        posts = RendersManyField(component="post")
+        wrappers = RendersManyField()
 
         template = """
         {% load viewcomponent_tags %}
         {{ self.header.value }}
         {% for post in self.posts.value %}
           {{ post }}
+        {% endfor %}
+        {% for wrapper in self.wrappers.value %}
+          {{ wrapper }}
         {% endfor %}
         """
 
@@ -61,6 +59,12 @@ class TestRenderFieldComponentContextLogic:
         component.registry.register("post", self.PostComponent)
 
     def test_field_context_logic(self):
+        """
+        HeaderComponent.get_context_data add extra context data
+
+        We can still access the value via {{ site_name }}
+        """
+
         for i in range(5):
             title = f"test {i}"
             description = f"test {i}"
@@ -77,6 +81,56 @@ class TestRenderFieldComponentContextLogic:
                 {% endcall %}
                 {% for post in qs %}
                     {% call component.posts post=post %}{% endcall %}
+                {% endfor %}
+            {% endcomponent %}
+            """,
+        )
+        rendered = template.render(Context({"qs": qs}))
+        expected = """
+        <h1 class="text-lg">
+            <a href="/">My Site</a>
+        </h1>
+
+        <h1>test 0</h1>
+        <div>test 0</div>
+
+        <h1>test 1</h1>
+        <div>test 1</div>
+
+        <h1>test 2</h1>
+        <div>test 2</div>
+
+        <h1>test 3</h1>
+        <div>test 3</div>
+
+        <h1>test 4</h1>
+        <div>test 4</div>
+        """
+        assert_dom_equal(expected, rendered)
+
+    def test_field_context_logic_2(self):
+        """
+        can still concatenate the HTML manually and pass to slot field
+        """
+        for i in range(5):
+            title = f"test {i}"
+            description = f"test {i}"
+            Post.objects.create(title=title, description=description)
+
+        qs = Post.objects.all()
+
+        template = Template(
+            """
+            {% load viewcomponent_tags %}
+            {% component 'blog' as component %}
+                {% call component.header classes='text-lg' %}
+                    <a href="/"> {{ site_name }} </a>
+                {% endcall %}
+                {% for post in qs %}
+                    {% call component.wrappers %}
+                        <h1>{{ post.title }}</h1>
+                        <div>{{ post.description }}</div>
+                    {% endcall %}
                 {% endfor %}
             {% endcomponent %}
             """,

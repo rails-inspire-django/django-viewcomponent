@@ -75,6 +75,7 @@ class CallNode(Node):
             )
 
         resolved_kwargs["nodelist"] = self.nodelist
+        resolved_kwargs["context"] = context
 
         component_token, field_token = self.args[0].token.split(".")
         component_instance = FilterExpression(component_token, self.parser).resolve(
