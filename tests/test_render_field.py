@@ -518,3 +518,60 @@ class TestRenderFieldComponentParameterLambdaReturnInstance:
         <div>test 4</div>
         """
         assert_dom_equal(expected, rendered)
+
+
+@pytest.mark.django_db
+class TestRenderFieldTypes:
+    """
+    Polymorphic slots
+    """
+
+    class AvatarComponent(component.Component):
+        def __init__(self, src, alt, **kwargs):
+            self.src = src
+            self.alt = alt
+
+        template = """
+            <img src="{{ self.src }}" alt="{{ self.alt }}">
+        """
+
+    class ListItemComponent(component.Component):
+        item = RendersOneField(
+            required=True,
+            types={
+                "avatar": "avatar",
+                "span": lambda text, **kwargs: mark_safe(f"<span>{text}</span>"),
+            },
+        )
+
+        template = """
+            <li>{{ self.item.value }}</li>
+        """
+
+    @pytest.fixture(autouse=True)
+    def register_component(self):
+        component.registry.register("list_item", self.ListItemComponent)
+        component.registry.register("avatar", self.AvatarComponent)
+
+    def test_field_component_parameter(self):
+        template = Template(
+            """
+            {% load viewcomponent_tags %}
+            {% component 'list_item' as component %}
+                {% call component.item_avatar alt='username' src='http://some-site.com/my_avatar.jpg' %}{% endcall %}
+            {% endcomponent %}
+            {% component 'list_item' as component %}
+                {% call component.item_span text='username' %}{% endcall %}
+            {% endcomponent %}
+            """,
+        )
+        rendered = template.render(Context({}))
+        expected = """
+        <li>
+            <img src="http://some-site.com/my_avatar.jpg" alt="username">
+        </li>
+        <li>
+            <span>username</span>
+        </li>
+        """
+        assert_dom_equal(expected, rendered)

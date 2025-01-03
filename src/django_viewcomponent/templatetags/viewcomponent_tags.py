@@ -84,15 +84,29 @@ class CallNode(Node):
         if not component_instance:
             raise ValueError(f"Component {component_token} not found in context")
 
-        field = getattr(component_instance, field_token, None)
-        if not field:
+        available_slot_fields_map = {}
+        # iterate all attributes of the component instance and add the BaseSlotField to the list
+        for field_name in dir(component_instance):
+            field = getattr(component_instance, field_name)
+            if isinstance(field, BaseSlotField):
+                types = field.types
+                if types:
+                    for polymorphic_type in types:
+                        available_slot_fields_map[
+                            f"{field_name}_{polymorphic_type}"
+                        ] = [field, polymorphic_type]
+                else:
+                    available_slot_fields_map[field_name] = [field, None]
+
+        if field_token not in available_slot_fields_map:
             raise ValueError(
                 f"Field {field_token} not found in component {component_token}",
             )
 
-        if isinstance(field, BaseSlotField):
-            # call field
-            return field.handle_call(**resolved_kwargs) or ""
+        field, polymorphic_type = available_slot_fields_map[field_token]
+        resolved_kwargs["polymorphic_type"] = polymorphic_type
+
+        return field.handle_call(**resolved_kwargs) or ""
 
 
 class ComponentNode(Node):

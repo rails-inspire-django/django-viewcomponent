@@ -6,12 +6,16 @@ class FieldValue:
         self,
         nodelist,
         field_context,
+        polymorphic_type,
+        polymorphic_types,
         dict_data: dict,
         component: None,
         parent_component=None,
     ):
         self._nodelist = nodelist
         self._field_context = field_context
+        self._polymorphic_type = polymorphic_type
+        self._polymorphic_types = polymorphic_types
         self._dict_data = dict_data
         self._component = component
         self._parent_component = parent_component
@@ -20,15 +24,23 @@ class FieldValue:
         return self.render()
 
     def render(self):
+        if self._polymorphic_types:
+            component_expression = self._polymorphic_types[self._polymorphic_type]
+            return self._render(component_expression)
+        else:
+            component_expression = self._component
+            return self._render(component_expression)
+
+    def _render(self, target):
         from django_viewcomponent.component import Component
 
-        if isinstance(self._component, str):
+        if isinstance(target, str):
             return self._render_for_component_cls(
-                component_registry.get(self._component),
+                component_registry.get(target),
             )
-        elif not isinstance(self._component, type) and callable(self._component):
-            # self._component is function
-            callable_component = self._component
+        elif not isinstance(target, type) and callable(target):
+            # target is function
+            callable_component = target
             result = callable_component(
                 self=self._parent_component,
                 **self._dict_data,
@@ -43,16 +55,16 @@ class FieldValue:
                 raise ValueError(
                     f"Callable slot component must return str or Component instance. Got {result}",
                 )
-        elif isinstance(self._component, type) and issubclass(
-            self._component,
+        elif isinstance(target, type) and issubclass(
+            target,
             Component,
         ):
-            # self._component is Component class
-            return self._render_for_component_cls(self._component)
-        elif self._component is None:
+            # target is Component class
+            return self._render_for_component_cls(target)
+        elif target is None:
             return self._nodelist.render(self._field_context)
         else:
-            raise ValueError(f"Invalid component variable {self._component}")
+            raise ValueError(f"Invalid component variable {target}")
 
     def _render_for_component_cls(self, component_cls):
         component = component_cls(
@@ -80,11 +92,12 @@ class FieldValue:
 class BaseSlotField:
     parent_component = None
 
-    def __init__(self, value=None, required=False, component=None, **kwargs):
-        self._value = value
+    def __init__(self, required=False, component=None, types=None, **kwargs):
+        self._value = None
         self._filled = False
         self._required = required
         self._component = component
+        self._types = types
 
     @classmethod
     def initialize_fields(cls):
@@ -104,15 +117,21 @@ class BaseSlotField:
     def required(self):
         return self._required
 
-    def handle_call(self, nodelist, context, **kwargs):
+    @property
+    def types(self):
+        return self._types
+
+    def handle_call(self, nodelist, context, polymorphic_type, **kwargs):
         raise NotImplementedError("You must implement the `handle_call` method.")
 
 
 class RendersOneField(BaseSlotField):
-    def handle_call(self, nodelist, context, **kwargs):
+    def handle_call(self, nodelist, context, polymorphic_type, **kwargs):
         value_instance = FieldValue(
             nodelist=nodelist,
             field_context=context,
+            polymorphic_type=polymorphic_type,
+            polymorphic_types=self.types,
             dict_data={**kwargs},
             component=self._component,
             parent_component=self.parent_component,
@@ -134,10 +153,12 @@ class FieldValueListWrapper:
 
 
 class RendersManyField(BaseSlotField):
-    def handle_call(self, nodelist, context, **kwargs):
+    def handle_call(self, nodelist, context, polymorphic_type, **kwargs):
         value_instance = FieldValue(
             nodelist=nodelist,
             field_context=context,
+            polymorphic_type=polymorphic_type,
+            polymorphic_types=self.types,
             dict_data={**kwargs},
             component=self._component,
             parent_component=self.parent_component,

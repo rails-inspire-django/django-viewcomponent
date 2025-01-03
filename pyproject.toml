@@ -61,6 +61,7 @@ lint.ignore = [
     "SIM118",
     "UP031",
     "PT011",
+    "PLR0913",
 ]
 lint.select = ["ALL"]
 exclude = ["migrations"]
