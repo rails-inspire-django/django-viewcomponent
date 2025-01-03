@@ -21,7 +21,7 @@ class TestRenderFieldComponentContextLogic:
 
         template = """
             <h1 class="{{ self.classes }}">
-              {{ self.content }}
+                <a href="/"> {{ site_name }} </a>
             </h1>
         """
 
@@ -76,9 +76,7 @@ class TestRenderFieldComponentContextLogic:
             """
             {% load viewcomponent_tags %}
             {% component 'blog' as component %}
-                {% call component.header classes='text-lg' %}
-                    <a href="/"> {{ site_name }} </a>
-                {% endcall %}
+                {% call component.header classes='text-lg' %}{% endcall %}
                 {% for post in qs %}
                     {% call component.posts post=post %}{% endcall %}
                 {% endfor %}
@@ -123,9 +121,7 @@ class TestRenderFieldComponentContextLogic:
             """
             {% load viewcomponent_tags %}
             {% component 'blog' as component %}
-                {% call component.header classes='text-lg' %}
-                    <a href="/"> {{ site_name }} </a>
-                {% endcall %}
+                {% call component.header classes='text-lg' %}{% endcall %}
                 {% for post in qs %}
                     {% call component.wrappers %}
                         <h1>{{ post.title }}</h1>
@@ -516,5 +512,62 @@ class TestRenderFieldComponentParameterLambdaReturnInstance:
 
         <h1>test 4</h1>
         <div>test 4</div>
+        """
+        assert_dom_equal(expected, rendered)
+
+
+@pytest.mark.django_db
+class TestRenderFieldTypes:
+    """
+    Polymorphic slots
+    """
+
+    class AvatarComponent(component.Component):
+        def __init__(self, src, alt, **kwargs):
+            self.src = src
+            self.alt = alt
+
+        template = """
+            <img src="{{ self.src }}" alt="{{ self.alt }}">
+        """
+
+    class ListItemComponent(component.Component):
+        item = RendersOneField(
+            required=True,
+            types={
+                "avatar": "avatar",
+                "span": lambda content, **kwargs: mark_safe(f"<span>{content}</span>"),
+            },
+        )
+
+        template = """
+            <li>{{ self.item.value }}</li>
+        """
+
+    @pytest.fixture(autouse=True)
+    def register_component(self):
+        component.registry.register("list_item", self.ListItemComponent)
+        component.registry.register("avatar", self.AvatarComponent)
+
+    def test_field_component_parameter(self):
+        template = Template(
+            """
+            {% load viewcomponent_tags %}
+            {% component 'list_item' as component %}
+                {% call component.item_avatar alt='username' src='http://some-site.com/my_avatar.jpg' %}{% endcall %}
+            {% endcomponent %}
+            {% component 'list_item' as component %}
+                {% call component.item_span %}username{% endcall %}
+            {% endcomponent %}
+            """,
+        )
+        rendered = template.render(Context({}))
+        expected = """
+        <li>
+            <img src="http://some-site.com/my_avatar.jpg" alt="username">
+        </li>
+        <li>
+            <span>username</span>
+        </li>
         """
         assert_dom_equal(expected, rendered)

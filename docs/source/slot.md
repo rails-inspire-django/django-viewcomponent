@@ -394,3 +394,36 @@ class BlogComponent(component.Component):
         {% endfor %}
         """
 ```
+
+
+## Polymorphic slots
+
+Polymorphic slots can render one of several possible slots.
+
+For example, consider this list item component that can be rendered with either an icon or an avatar. 
+
+```python
+class ListItemComponent(component.Component):
+    item = RendersOneField(
+        types={
+            "avatar": AvatarComponent,
+            "icon": lambda key, **kwargs: IconComponent(key=key),
+        },
+    )
+```
+
+The values in `types` can be the same as `component` argument in `RendersOneField`, it can be a string, a class, a function
+
+Filling the slot is done calling `{field}_{type}`, please note the `type` key is set as `suffix` to the slot field.
+
+```django
+{% load viewcomponent_tags %}
+
+{% component 'list_item' as component %}
+    {% call component.item_avatar alt='username' src='http://some-site.com/my_avatar.jpg' %}{% endcall %}
+{% endcomponent %}
+
+{% component 'list_item' as component %}
+    {% call component.item_icon key='arrow-down' %}{% endcall %}
+{% endcomponent %}
+```
