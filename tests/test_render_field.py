@@ -21,7 +21,7 @@ class TestRenderFieldComponentContextLogic:
 
         template = """
             <h1 class="{{ self.classes }}">
-              {{ self.content }}
+                <a href="/"> {{ site_name }} </a>
             </h1>
         """
 
@@ -76,9 +76,7 @@ class TestRenderFieldComponentContextLogic:
             """
             {% load viewcomponent_tags %}
             {% component 'blog' as component %}
-                {% call component.header classes='text-lg' %}
-                    <a href="/"> {{ site_name }} </a>
-                {% endcall %}
+                {% call component.header classes='text-lg' %}{% endcall %}
                 {% for post in qs %}
                     {% call component.posts post=post %}{% endcall %}
                 {% endfor %}
@@ -123,9 +121,7 @@ class TestRenderFieldComponentContextLogic:
             """
             {% load viewcomponent_tags %}
             {% component 'blog' as component %}
-                {% call component.header classes='text-lg' %}
-                    <a href="/"> {{ site_name }} </a>
-                {% endcall %}
+                {% call component.header classes='text-lg' %}{% endcall %}
                 {% for post in qs %}
                     {% call component.wrappers %}
                         <h1>{{ post.title }}</h1>

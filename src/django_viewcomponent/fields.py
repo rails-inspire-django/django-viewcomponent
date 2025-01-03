@@ -74,17 +74,18 @@ class FieldValue:
         return self._render_for_component_instance(component)
 
     def _render_for_component_instance(self, component):
-        component.component_context = self._parent_component.component_context
+        component.component_context = self._field_context
 
         with component.component_context.push():
-            updated_context = component.get_context_data()
-
             # create slot fields
             component.create_slot_fields()
 
-            component.content = self._nodelist.render(updated_context)
+            # render content first
+            component.content = self._nodelist.render(component.component_context)
 
             component.check_slot_fields()
+
+            updated_context = component.get_context_data()
 
             return component.render(updated_context)
 
