@@ -414,13 +414,15 @@ class ListItemComponent(component.Component):
 
 The values in `types` can be the same as `component` argument in `RendersOneField`, it can be a string, a class, a function
 
-Filling the slot is done calling `{field}_{type}`
+Filling the slot is done calling `{field}_{type}`, please note the `type` key is set as `suffix` to the slot field.
 
 ```django
 {% load viewcomponent_tags %}
+
 {% component 'list_item' as component %}
     {% call component.item_avatar alt='username' src='http://some-site.com/my_avatar.jpg' %}{% endcall %}
 {% endcomponent %}
+
 {% component 'list_item' as component %}
     {% call component.item_icon key='arrow-down' %}{% endcall %}
 {% endcomponent %}
