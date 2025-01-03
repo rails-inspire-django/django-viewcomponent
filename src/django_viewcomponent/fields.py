@@ -5,11 +5,13 @@ class FieldValue:
     def __init__(
         self,
         nodelist,
+        field_context,
         dict_data: dict,
         component: None,
         parent_component=None,
     ):
         self._nodelist = nodelist
+        self._field_context = field_context
         self._dict_data = dict_data
         self._component = component
         self._parent_component = parent_component
@@ -48,7 +50,7 @@ class FieldValue:
             # self._component is Component class
             return self._render_for_component_cls(self._component)
         elif self._component is None:
-            return self._nodelist.render(self._parent_component.component_context)
+            return self._nodelist.render(self._field_context)
         else:
             raise ValueError(f"Invalid component variable {self._component}")
 
@@ -102,30 +104,25 @@ class BaseSlotField:
     def required(self):
         return self._required
 
-    def handle_call(self, nodelist, **kwargs):
+    def handle_call(self, nodelist, context, **kwargs):
         raise NotImplementedError("You must implement the `handle_call` method.")
 
 
 class RendersOneField(BaseSlotField):
-    def handle_call(self, nodelist, **kwargs):
+    def handle_call(self, nodelist, context, **kwargs):
         value_instance = FieldValue(
             nodelist=nodelist,
+            field_context=context,
             dict_data={**kwargs},
             component=self._component,
             parent_component=self.parent_component,
         )
 
+        self._value = value_instance.render()
         self._filled = True
-        self._value = value_instance
 
 
 class FieldValueListWrapper:
-    """
-    This helps render FieldValue eagerly when component template has
-    {% for panel in self.panels.value %}, this can avoid issues if `panel` of the for loop statement
-    # override context variables in some cases.
-    """
-
     def __init__(self):
         self.data = []
 
@@ -133,14 +130,14 @@ class FieldValueListWrapper:
         self.data.append(value)
 
     def __iter__(self):
-        for field_value in self.data:
-            yield field_value.render()
+        yield from self.data
 
 
 class RendersManyField(BaseSlotField):
-    def handle_call(self, nodelist, **kwargs):
+    def handle_call(self, nodelist, context, **kwargs):
         value_instance = FieldValue(
             nodelist=nodelist,
+            field_context=context,
             dict_data={**kwargs},
             component=self._component,
             parent_component=self.parent_component,
@@ -149,5 +146,5 @@ class RendersManyField(BaseSlotField):
         if self._value is None:
             self._value = FieldValueListWrapper()
 
-        self._value.append(value_instance)
+        self._value.append(value_instance.render())
         self._filled = True
