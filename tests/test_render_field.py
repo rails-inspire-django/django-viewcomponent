@@ -536,7 +536,7 @@ class TestRenderFieldTypes:
             required=True,
             types={
                 "avatar": "avatar",
-                "span": lambda text, **kwargs: mark_safe(f"<span>{text}</span>"),
+                "span": lambda content, **kwargs: mark_safe(f"<span>{content}</span>"),
             },
         )
 
@@ -557,7 +557,7 @@ class TestRenderFieldTypes:
                 {% call component.item_avatar alt='username' src='http://some-site.com/my_avatar.jpg' %}{% endcall %}
             {% endcomponent %}
             {% component 'list_item' as component %}
-                {% call component.item_span text='username' %}{% endcall %}
+                {% call component.item_span %}username{% endcall %}
             {% endcomponent %}
             """,
         )

@@ -41,8 +41,10 @@ class FieldValue:
         elif not isinstance(target, type) and callable(target):
             # target is function
             callable_component = target
+            content = self._nodelist.render(self._field_context)
             result = callable_component(
                 self=self._parent_component,
+                content=content,
                 **self._dict_data,
             )
 
