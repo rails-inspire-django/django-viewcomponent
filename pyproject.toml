@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-viewcomponent"
-version = "1.0.9"
+version = "1.0.10"
 description = "Build reusable components in Django, inspired by Rails ViewComponent"
 authors = ["Michael Yin <michaelyin@accordbox.com>"]
 license = "MIT"
