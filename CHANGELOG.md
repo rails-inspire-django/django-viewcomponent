@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.10
+
+1. Fix missing context variable in the `call` tag.
+2. Add `Polymorphic slots` support.
+
 ## 1.0.9
 
 1. Make `comopnent` argument in `Renders Fields` supports component registered name, component class, and function.
