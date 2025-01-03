@@ -118,6 +118,21 @@ Notes:
 <a href="/">Post 2</a>
 ```
 
+Or you can use django for loop do this:
+
+```django
+{% component 'blog' as component %}
+    {% call blog_component.header %}
+        <a href="/">My Site</a>
+    {% endcall %}
+    {% for post in qs %}
+        {% call component.posts %}
+            <a href="/">{{ post.title }}</a>     
+        {% endcall %}
+    {% endfor %}
+{% endcomponent %}
+```
+
 ## Connect other component in the slot
 
 This is the **killer feature**, so please read it carefully.
