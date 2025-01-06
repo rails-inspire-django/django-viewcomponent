@@ -6,6 +6,7 @@ class FieldValue:
         self,
         nodelist,
         field_context,
+        target_var,
         polymorphic_type,
         polymorphic_types,
         dict_data: dict,
@@ -14,6 +15,7 @@ class FieldValue:
     ):
         self._nodelist = nodelist
         self._field_context = field_context
+        self._target_var = target_var
         self._polymorphic_type = polymorphic_type
         self._polymorphic_types = polymorphic_types
         self._dict_data = dict_data
@@ -76,18 +78,24 @@ class FieldValue:
         return self._render_for_component_instance(component)
 
     def _render_for_component_instance(self, component):
+        """
+        The logic should be the same as in the ComponentNode.render method
+        """
+        component.component_target_var = self._target_var
         component.component_context = self._field_context
 
+        # https://docs.djangoproject.com/en/5.1/ref/templates/api/#django.template.Context.push
         with component.component_context.push():
+            # developer can add extra context data in this method
+            updated_context = component.get_context_data()
+
             # create slot fields
             component.create_slot_fields()
 
             # render content first
-            component.content = self._nodelist.render(component.component_context)
+            component.content = self._nodelist.render(updated_context)
 
             component.check_slot_fields()
-
-            updated_context = component.get_context_data()
 
             return component.render(updated_context)
 
@@ -124,15 +132,16 @@ class BaseSlotField:
     def types(self):
         return self._types
 
-    def handle_call(self, nodelist, context, polymorphic_type, **kwargs):
+    def handle_call(self, nodelist, context, target_var, polymorphic_type, **kwargs):
         raise NotImplementedError("You must implement the `handle_call` method.")
 
 
 class RendersOneField(BaseSlotField):
-    def handle_call(self, nodelist, context, polymorphic_type, **kwargs):
+    def handle_call(self, nodelist, context, target_var, polymorphic_type, **kwargs):
         value_instance = FieldValue(
             nodelist=nodelist,
             field_context=context,
+            target_var=target_var,
             polymorphic_type=polymorphic_type,
             polymorphic_types=self.types,
             dict_data={**kwargs},
@@ -156,10 +165,11 @@ class FieldValueListWrapper:
 
 
 class RendersManyField(BaseSlotField):
-    def handle_call(self, nodelist, context, polymorphic_type, **kwargs):
+    def handle_call(self, nodelist, context, target_var, polymorphic_type, **kwargs):
         value_instance = FieldValue(
             nodelist=nodelist,
             field_context=context,
+            target_var=target_var,
             polymorphic_type=polymorphic_type,
             polymorphic_types=self.types,
             dict_data={**kwargs},

@@ -16,6 +16,13 @@ register = django.template.Library()
 @register.tag("call")
 def do_call(parser, token):
     bits = token.split_contents()
+
+    # check as keyword
+    target_var = None
+    if len(bits) >= 4 and bits[-2] == "as":
+        target_var = bits[-1]
+        bits = bits[:-2]
+
     tag_name = "call"
     tag_args, tag_kwargs = parse_bits(
         parser=parser,
@@ -43,6 +50,7 @@ def do_call(parser, token):
     return CallNode(
         parser=parser,
         nodelist=nodelist,
+        target_var=target_var,
         args=args,
         kwargs=kwargs,
     )
@@ -53,11 +61,13 @@ class CallNode(Node):
         self,
         parser,
         nodelist: NodeList,
+        target_var,
         args,
         kwargs,
     ):
         self.parser = parser
         self.nodelist: NodeList = nodelist
+        self.target_var = target_var
         self.args = args
         self.kwargs = kwargs
 
@@ -76,6 +86,7 @@ class CallNode(Node):
 
         resolved_kwargs["nodelist"] = self.nodelist
         resolved_kwargs["context"] = context
+        resolved_kwargs["target_var"] = self.target_var
 
         component_token, field_token = self.args[0].token.split(".")
         component_instance = FilterExpression(component_token, self.parser).resolve(

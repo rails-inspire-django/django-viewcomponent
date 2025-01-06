@@ -133,9 +133,13 @@ Or you can use django for loop do this:
 {% endcomponent %}
 ```
 
+```{note}
+Developer can use this approach to fill the slot field in a flexible way.
+```
+
 ## Connect other component in the slot
 
-This is the **killer feature**, so please read it carefully.
+This is the **killer feature** of this package, so please read it carefully.
 
 ### Component argument in RendersOneField
 
@@ -395,6 +399,104 @@ class BlogComponent(component.Component):
         """
 ```
 
+## Recursive Slot Field Call 
+
+Combining render fields and `component` argument is very powerful, let's step further to see how to do recursive slot field call.
+
+Let's assume you are building a generic table components:
+
+```
+Table
+    Row
+        Cell
+```
+
+Below is code example:
+
+```python
+class CellComponent(component.Component):
+
+    template = """
+    {% load viewcomponent_tags %}
+
+    <td>{{ self.content }}</td>
+    """
+
+
+class RowComponent(component.Component):
+
+    cells = RendersManyField(component=CellComponent)
+
+    template = """
+    {% load viewcomponent_tags %}
+
+    <tr>
+        {% for cell in self.cells.value %}
+            {{ cell }}
+        {% endfor %}
+    </tr>
+    """
+
+
+class TableComponent(component.Component):
+
+    rows = RendersManyField(component=RowComponent)
+
+    template = """
+    {% load viewcomponent_tags %}
+
+    <table>
+       <tbody>
+        {% for row in self.rows.value %}
+            {{ row }}
+        {% endfor %}
+      </tbody>       
+    </table>
+    """
+```
+
+1. `TableComponent.rows -> RowComponent`
+2. `RowComponent.cells -> CellComponent`
+
+To render the table, we can do it like this:
+
+```django
+{% load viewcomponent_tags %}
+
+{% component 'table' as table_component %}
+    {% for post in qs %}
+        {% call table_component.rows as row_component %}   -> Here we get the component of the slot field as `row_component`
+            {% call row_component.cells %}                 -> We just fill the slot field by calling row_component.cells 
+                <h1>{{ post.title }}</h1>
+            {% endcall %} 
+            {% call row_component.cells %} 
+                <div>{{ post.description }}</div>
+            {% endcall %} 
+        {% endcall %} 
+    {% endfor %}
+{% endcomponent %}
+```
+
+Notes:
+
+1. To render `table cell`, we do not need to explicitly use `{% component 'table_cell' %}`, but using `{% call row_component.cells %}` to do this in elegant way.
+
+The final HTML would seem like:
+
+```html
+<table>
+  <tbody>
+  <tr>
+    <td>
+      <h1>post title</h1>
+    </td>
+    <td>
+      <div>post desc</div>
+    </td>
+  </tr>
+  </tbody>
+</table>
+```
 
 ## Polymorphic slots
 
