@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.11
+
+1. Add `Recursive slot call` support.
+
 ## 1.0.10
 
 1. Fix missing context variable in the `call` tag.
