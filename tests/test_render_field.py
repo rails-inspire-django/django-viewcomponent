@@ -21,7 +21,7 @@ class TestRenderFieldComponentContextLogic:
 
         template = """
             <h1 class="{{ self.classes }}">
-                <a href="/"> {{ site_name }} </a>
+                {{ self.content }}
             </h1>
         """
 
@@ -76,7 +76,9 @@ class TestRenderFieldComponentContextLogic:
             """
             {% load viewcomponent_tags %}
             {% component 'blog' as component %}
-                {% call component.header classes='text-lg' %}{% endcall %}
+                {% call component.header classes='text-lg' %}
+                    <a href="/"> {{ site_name }} </a>
+                {% endcall %}
                 {% for post in qs %}
                     {% call component.posts post=post %}{% endcall %}
                 {% endfor %}
@@ -121,7 +123,9 @@ class TestRenderFieldComponentContextLogic:
             """
             {% load viewcomponent_tags %}
             {% component 'blog' as component %}
-                {% call component.header classes='text-lg' %}{% endcall %}
+                {% call component.header classes='text-lg' %}
+                    <a href="/"> {{ site_name }} </a>
+                {% endcall %}
                 {% for post in qs %}
                     {% call component.wrappers %}
                         <h1>{{ post.title }}</h1>
@@ -569,5 +573,110 @@ class TestRenderFieldTypes:
         <li>
             <span>username</span>
         </li>
+        """
+        assert_dom_equal(expected, rendered)
+
+
+class CellComponent(component.Component):
+    template = """
+    {% load viewcomponent_tags %}
+
+    <td>{{ self.content }}</td>
+    """
+
+
+class RowComponent(component.Component):
+    cells = RendersManyField(component=CellComponent)
+
+    template = """
+    {% load viewcomponent_tags %}
+
+    <tr>
+        {% for cell in self.cells.value %}
+            {{ cell }}
+        {% endfor %}
+    </tr>
+    """
+
+
+class TableComponent(component.Component):
+    rows = RendersManyField(component=RowComponent)
+
+    template = """
+    {% load viewcomponent_tags %}
+
+    <table>
+       <tbody>
+        {% for row in self.rows.value %}
+            {{ row }}
+        {% endfor %}
+      </tbody>
+    </table>
+    """
+
+
+@pytest.mark.django_db
+class TestRecursiveSlotCall:
+    @pytest.fixture(autouse=True)
+    def register_component(self):
+        component.registry.register("table", TableComponent)
+
+    def test_recursive_slot_call(self):
+        for i in range(3):
+            title = f"test {i}"
+            description = f"test {i}"
+            Post.objects.create(title=title, description=description)
+
+        qs = Post.objects.all()
+
+        template = Template(
+            """
+            {% load viewcomponent_tags %}
+
+            {% component 'table' as table_component %}
+                {% for post in qs %}
+                    {% call table_component.rows as row_component %}
+                        {% call row_component.cells %}
+                            <h1>{{ post.title }}</h1>
+                        {% endcall %}
+                        {% call row_component.cells %}
+                            <div>{{ post.description }}</div>
+                        {% endcall %}
+                    {% endcall %}
+                {% endfor %}
+            {% endcomponent %}
+
+            """,
+        )
+        rendered = template.render(Context({"qs": qs}))
+        expected = """
+<table>
+    <tbody>
+        <tr>
+            <td>
+                <h1>test 0</h1>
+            </td>
+            <td>
+                <div>test 0</div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h1>test 1</h1>
+            </td>
+            <td>
+                <div>test 1</div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h1>test 2</h1>
+            </td>
+            <td>
+                <div>test 2</div>
+            </td>
+        </tr>
+    </tbody>
+</table>
         """
         assert_dom_equal(expected, rendered)
