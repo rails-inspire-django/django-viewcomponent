@@ -18,7 +18,7 @@ class HelloComponent(component.Component):
     template = "<h1>Hello, {{ self.name }}!</h1>"
 
     def __init__(self, **kwargs):
-        self.title = kwargs['title']
+        self.name = kwargs['name']
 ```
 
 Notes:
