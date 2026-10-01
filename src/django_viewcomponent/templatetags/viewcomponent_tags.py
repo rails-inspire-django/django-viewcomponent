@@ -28,13 +28,13 @@ def do_call(parser, token):
         parser=parser,
         bits=bits,
         params=[],
-        takes_context=False,
         name=tag_name,
         varargs=True,
         varkw=[],
         defaults=None,
         kwonly=[],
         kwonly_defaults=None,
+        **({"takes_context": False} if django.VERSION < (6, 1) else {}),
     )
 
     if len(tag_args) > 1:
@@ -233,13 +233,13 @@ def parse_component_with_arguments(parser, bits, tag_name):
         parser=parser,
         bits=bits,
         params=["tag_name", "name"],
-        takes_context=False,
         name=tag_name,
         varargs=True,
         varkw=[],
         defaults=None,
         kwonly=[],
         kwonly_defaults=None,
+        **({"takes_context": False} if django.VERSION < (6, 1) else {}),
     )
 
     if tag_name != tag_args[0].token:
